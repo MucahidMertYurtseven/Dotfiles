@@ -60,22 +60,28 @@ Item {
                 Layout.fillWidth: true
             }
 
-            // TÜMÜNÜ TEMİZLE butonu — sadece bildirim varsa görünür
+            // TÜMÜNÜ TEMİZLE butonu — modern pill tasarım
             Rectangle {
                 id: clearAllBtn
                 visible: notificationModel ? notificationModel.count > 0 : false
-                width: 22; height: 22; radius: 5
+                implicitWidth: 28; height: 28; radius: 14
                 color: clearAllMa.containsMouse
                     ? (theme ? theme.hover : "#606060")
-                    : "transparent"
+                    : (theme ? theme.bgDark : "#202020")
+                border.color: clearAllMa.containsMouse
+                    ? (theme ? theme.textMuted : "#7e8099")
+                    : (theme ? theme.border : "#323232")
+                border.width: 1
                 Layout.alignment: Qt.AlignVCenter
 
                 Text {
                     anchors.centerIn: parent
-                    text: "✕"  // temizle ikonu
-                    color: theme ? theme.textMuted : "#7e8099"
-                    font.pixelSize: 10
-                    font.family: theme ? theme.fontFamily : "monospace"
+                    text: "✕"
+                    color: clearAllMa.containsMouse
+                        ? (theme ? theme.textBright : "#ffffff")
+                        : (theme ? theme.textMuted : "#7e8099")
+                    font.pixelSize: 14
+                    font.bold: true
                 }
 
                 MouseArea {
@@ -145,7 +151,7 @@ Item {
 
                             // Önem derecesi çizgisi (kritikse kırmızı)
                             Rectangle {
-                                width: 4; height: parent.height; radius: 2
+                                width: 2; height: parent.height; radius: 1
                                 color: urgency === 2
                                     ? (theme ? theme.warn : "#f38ba8")
                                     : (theme ? theme.active : "#b0b0b0")
