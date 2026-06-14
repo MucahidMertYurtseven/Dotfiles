@@ -112,8 +112,8 @@ ShellRoot {
         onNotification: function(notification) {
             notification.tracked = true
 
-            // ListModel'e ekle
-            notifModel.append({
+            // ListModel'e en başa ekle (en yeni en üstte)
+            notifModel.insert(0, {
                 id: notification.id,
                 summary: notification.summary || "",
                 body: notification.body || "",
