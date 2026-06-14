@@ -222,33 +222,33 @@ Rectangle {
             var right = AudioLevelService.peakRight || 0
 
             var rawVol = Math.max(left, right)
-            var vol = Math.pow(rawVol, 0.9) * 1.0
+            var vol = Math.pow(rawVol, 1.33) * 0.7
 
             var t = _visTime++
 
             // Çubuk yüksekliklerini hesapla
             for (var i = 0; i < n; i++) {
-                if (vol < 0.03) {
-                    heights[i] = heights[i] * 0.85
+                if (vol < 0.05) {
+                    heights[i] = heights[i] * 0.70
                     continue
                 }
 
                 var distanceToCenter = Math.abs((n / 2) - i) / (n / 2)
-                var bellCurve = 1.0 - (distanceToCenter * 0.3)
+                var bellCurve = 1.0 - (distanceToCenter * 0.25)
 
-                var fastWave = Math.abs(Math.sin(i * 4.0 + t * 0.35))
-                var slowWave = Math.abs(Math.cos(i * 2.0 - t * 0.15))
-                var noise = (fastWave * 0.5) + (slowWave * 0.5)
+                var fastWave = Math.abs(Math.sin(i * 4.0 + t * 0.5))
+                var slowWave = Math.abs(Math.cos(i * 2.0 - t * 0.2))
+                var noise = (fastWave * 0.55) + (slowWave * 0.45)
 
-                var spike = (Math.random() > 0.92) ? 1.2 : 0.95
+                var spike = (Math.random() > 0.8) ? 1.5 : 0.92
 
-                var target = vol * noise * bellCurve * spike * 28
-                target = Math.max(1, Math.min(28, target))
+                var target = vol * noise * bellCurve * spike * 30
+                target = Math.max(2, Math.min(30, target))
 
                 if (target > heights[i]) {
-                    heights[i] = heights[i] * 0.35 + target * 0.65
+                    heights[i] = heights[i] * 0.25 + target * 0.75
                 } else {
-                    heights[i] = heights[i] * 0.90 + target * 0.10
+                    heights[i] = heights[i] * 0.93 + target * 0.07
                 }
             }
 
