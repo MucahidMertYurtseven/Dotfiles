@@ -116,10 +116,11 @@ Item {
                     model: NetworkService.enabled ? NetworkService.networks : []
 
                     Rectangle {
+                        id: wifiItem
                         width: parent.width
                         implicitHeight: 36
                         radius: 6
-                        color: modelData?.connected
+                        color: modelData?.connected || wifiHover.containsMouse
                             ? (theme ? theme.hover : "#606060")
                             : "transparent"
 
@@ -184,6 +185,13 @@ Item {
                                     }
                                 }
                             }
+                        }
+
+                        MouseArea {
+                            id: wifiHover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
                         }
                     }
                 }

@@ -189,10 +189,11 @@ Item {
                     model: NetworkService.btEnabled ? root._devices : []
 
                     Rectangle {
+                        id: btItem
                         width: parent.width
                         implicitHeight: 36
                         radius: 6
-                        color: modelData?.connected
+                        color: modelData?.connected || btHover.containsMouse
                             ? (theme ? theme.hover : "#606060")
                             : "transparent"
 
@@ -258,6 +259,13 @@ Item {
                                     }
                                 }
                             }
+                        }
+
+                        MouseArea {
+                            id: btHover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
                         }
                     }
                 }
