@@ -222,7 +222,7 @@ Rectangle {
             var right = AudioLevelService.peakRight || 0
 
             var rawVol = Math.max(left, right)
-            var vol = Math.pow(rawVol, 1.2) * 0.85
+            var vol = Math.pow(rawVol, 0.8) * 1.2
 
             var t = _visTime++
 
@@ -242,8 +242,8 @@ Rectangle {
 
                 var spike = (Math.random() > 0.7) ? 1.8 : 0.9
 
-                var target = vol * noise * bellCurve * spike * 30
-                target = Math.max(1, Math.min(30, target))
+                var target = vol * noise * bellCurve * spike * 36
+                target = Math.max(1, Math.min(32, target))
 
                 if (target > heights[i]) {
                     heights[i] = heights[i] * 0.2 + target * 0.8
