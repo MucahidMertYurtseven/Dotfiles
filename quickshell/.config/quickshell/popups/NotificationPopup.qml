@@ -149,12 +149,12 @@ Item {
                             anchors.rightMargin: 8
                             spacing: 8
 
-                            // Önem derecesi çizgisi (kritikse kırmızı)
+                            // Önem derecesi çizgisi (toast ile uyumlu)
                             Rectangle {
-                                width: 2; height: parent.height; radius: 1
-                                color: urgency === 2
-                                    ? (theme ? theme.warn : "#f38ba8")
-                                    : (theme ? theme.active : "#b0b0b0")
+                                width: 3; height: parent.height; radius: 1.5
+                                color: urgency === 2 ? (theme ? theme.warn : "#f38ba8")
+                                     : urgency === 1 ? (theme ? theme.text : "#c5c5c5")
+                                     : (theme ? theme.textMuted : "#7e8099")
                             }
 
                             // Bildirim içeriği: başlık + mesaj
