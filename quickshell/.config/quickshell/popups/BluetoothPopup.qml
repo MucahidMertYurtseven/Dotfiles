@@ -224,12 +224,11 @@ Item {
                                 elide: Text.ElideRight
                             }
 
-                            // Bağlantı durumu
+                            // Bağlıysa yeşil nokta
                             Text {
-                                text: modelData?.connected ? "󰁨" : ""
+                                text: modelData?.connected ? "\u25CF" : ""
                                 color: theme ? theme.green : "#4ade80"
-                                font.pixelSize: 12
-                                font.family: theme ? theme.fontFamily : "monospace"
+                                font.pixelSize: 10
                             }
 
                             // Bağlan/kopar düğmesi
@@ -239,12 +238,13 @@ Item {
                                 border.color: theme ? theme.border : "#323232"
                                 border.width: 1
 
-                                Text {
+                                ColorizedIcon {
                                     anchors.centerIn: parent
-                                    text: modelData?.connected ? "✕" : "󰁨"
-                                    color: theme ? theme.text : "#c5c5c5"
-                                    font.pixelSize: 10
-                                    font.family: theme ? theme.fontFamily : "monospace"
+                                    source: modelData?.connected
+                                        ? root._icon + "network-bluetooth-activated-symbolic.svg"
+                                        : root._icon + "network-bluetooth-inactive-symbolic.svg"
+                                    iconSize: modelData?.connected ? 10 : 12
+                                    iconColor: theme ? theme.text : "#c5c5c5"
                                 }
 
                                 MouseArea {

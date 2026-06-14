@@ -154,12 +154,11 @@ Item {
                                 elide: Text.ElideRight
                             }
 
-                            // Bağlıysa onay işareti
+                            // Bağlıysa yeşil nokta
                             Text {
-                                text: modelData?.connected ? "󰁨" : ""
+                                text: modelData?.connected ? "\u25CF" : ""
                                 color: theme ? theme.green : "#4ade80"
-                                font.pixelSize: 12
-                                font.family: theme ? theme.fontFamily : "monospace"
+                                font.pixelSize: 10
                             }
 
                             // Bağlanma düğmesi (bağlı değilse)
