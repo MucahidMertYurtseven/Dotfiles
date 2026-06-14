@@ -38,6 +38,7 @@ Rectangle {
     property variant _barHeights: []
     property bool _barInit: false
     property int _visTime: 0
+    readonly property int _barCount: 30
 
     height: 32
     clip: true
@@ -129,18 +130,19 @@ Rectangle {
             id: visBg
             anchors.fill: parent
             clip: true
-            opacity: 0.15
+            opacity: 0.2
             Repeater {
-                model: 64
+                model: root._barCount
                 Rectangle {
-                    x: index * (parent.width / 64)
-                    width: parent.width / 64 - 1
-                    height: _barHeights.length === 64 ? _barHeights[index] : 0
+                    x: index * (parent.width / root._barCount)
+                    width: parent.width / root._barCount - 2
+                    height: _barHeights.length === root._barCount ? _barHeights[index] : 0
                     radius: width / 2
                     color: theme ? theme.text : "#c5c5c5"
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 2
                     Behavior on height {
-                        NumberAnimation { duration: 30; easing.type: Easing.OutSine }
+                        NumberAnimation { duration: 60; easing.type: Easing.OutSine }
                     }
                 }
             }
@@ -196,11 +198,11 @@ Rectangle {
     on_DispTextChanged: { _marqueeX = marqueeHost ? marqueeHost.width : width }
     on_ShowMediaChanged: { if (_showMedia) _marqueeX = marqueeHost ? marqueeHost.width : width }
 
-    // -- Ses görselleştirici animasyonu --
+    // -- Ses görselleştirici animasyonu (Apple tarzı) --
     Timer {
-        interval: 70; running: _showMedia; repeat: true
+        interval: 50; running: _showMedia; repeat: true
         onTriggered: {
-            var n = 64
+            var n = root._barCount
 
             if (!_barInit) {
                 var a = []
@@ -213,7 +215,7 @@ Rectangle {
 
             // Çalmıyorsa çubukları yavaşça sıfırla
             if (!root._isPlaying) {
-                for (var k = 0; k < n; k++) heights[k] = heights[k] * 0.70
+                for (var k = 0; k < n; k++) heights[k] = heights[k] * 0.85
                 _barHeights = heights
                 return
             }
@@ -221,34 +223,36 @@ Rectangle {
             var left = AudioLevelService.peakLeft || 0
             var right = AudioLevelService.peakRight || 0
 
-            var rawVol = Math.max(left, right)
-            var vol = Math.pow(rawVol, 1.33) * 0.7
+            var energy = Math.max(left, right)
 
             var t = _visTime++
 
-            // Çubuk yüksekliklerini hesapla
             for (var i = 0; i < n; i++) {
-                if (vol < 0.05) {
-                    heights[i] = heights[i] * 0.70
+                if (energy < 0.02) {
+                    heights[i] = heights[i] * 0.85
                     continue
                 }
 
-                var distanceToCenter = Math.abs((n / 2) - i) / (n / 2)
-                var bellCurve = 1.0 - (distanceToCenter * 0.25)
+                // Frekans bandı simülasyonu (her bar farklı frekans)
+                var freq = (i / n) * 8
+                var wave = Math.abs(Math.sin(freq * Math.PI + t * 0.04))
+                var subWave = Math.abs(Math.cos(freq * 0.7 * Math.PI - t * 0.025))
+                var motion = wave * 0.6 + subWave * 0.4
 
-                var fastWave = Math.abs(Math.sin(i * 4.0 + t * 0.5))
-                var slowWave = Math.abs(Math.cos(i * 2.0 - t * 0.2))
-                var noise = (fastWave * 0.55) + (slowWave * 0.45)
+                // Enerjiye duyarlılık (Apple'da yumuşak)
+                var amp = Math.pow(energy, 0.7) * 2.5
 
-                var spike = (Math.random() > 0.8) ? 1.5 : 0.92
+                // Orta frekans hafif vurgulu (Apple smile curve)
+                var midBoost = 1.0 + 0.3 * Math.sin((i / n) * Math.PI)
 
-                var target = vol * noise * bellCurve * spike * 30
-                target = Math.max(2, Math.min(30, target))
+                var target = motion * amp * midBoost * 18
+                target = Math.max(1, Math.min(28, target))
 
+                // Apple tarzı yumuşak geçiş
                 if (target > heights[i]) {
-                    heights[i] = heights[i] * 0.25 + target * 0.75
+                    heights[i] = heights[i] * 0.45 + target * 0.55
                 } else {
-                    heights[i] = heights[i] * 0.93 + target * 0.07
+                    heights[i] = heights[i] * 0.88 + target * 0.12
                 }
             }
 
