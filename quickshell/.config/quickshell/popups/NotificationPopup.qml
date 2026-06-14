@@ -60,39 +60,6 @@ Item {
                 Layout.fillWidth: true
             }
 
-            // TÜMÜNÜ TEMİZLE butonu — modern pill tasarım
-            Rectangle {
-                id: clearAllBtn
-                visible: notificationModel ? notificationModel.count > 0 : false
-                implicitWidth: 28; height: 28; radius: 14
-                color: clearAllMa.containsMouse
-                    ? (theme ? theme.hover : "#606060")
-                    : (theme ? theme.bgDark : "#202020")
-                border.color: clearAllMa.containsMouse
-                    ? (theme ? theme.textMuted : "#7e8099")
-                    : (theme ? theme.border : "#323232")
-                border.width: 1
-                Layout.alignment: Qt.AlignVCenter
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "✕"
-                    color: clearAllMa.containsMouse
-                        ? (theme ? theme.textBright : "#ffffff")
-                        : (theme ? theme.textMuted : "#7e8099")
-                    font.pixelSize: 14
-                    font.bold: true
-                }
-
-                MouseArea {
-                    id: clearAllMa
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.clearAll()
-                }
-            }
-
             // DND toggle düğmesi
             Rectangle {
                 width: 44; height: 24; radius: 12
@@ -235,6 +202,36 @@ Item {
                     font.family: theme ? theme.fontFamily : "monospace"
                     topPadding: 8
                 }
+            }
+        }
+
+        // Tümünü temizle
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 28
+            visible: notificationModel ? notificationModel.count > 0 : false
+            color: clearAllFooter.containsMouse
+                ? (theme ? theme.hover : "#606060")
+                : "transparent"
+            radius: 6
+
+            Text {
+                anchors.centerIn: parent
+                text: "Tümünü Temizle"
+                color: clearAllFooter.containsMouse
+                    ? (theme ? theme.textBright : "#ffffff")
+                    : (theme ? theme.textMuted : "#7e8099")
+                font.pixelSize: 11
+                font.bold: true
+                font.family: theme ? theme.fontFamily : "monospace"
+            }
+
+            MouseArea {
+                id: clearAllFooter
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.clearAll()
             }
         }
     }
