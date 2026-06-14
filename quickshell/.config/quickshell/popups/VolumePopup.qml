@@ -105,7 +105,7 @@ Item {
             Layout.leftMargin: 4; Layout.rightMargin: 4
 
             property real value: root.vol
-            readonly property real _pos: value
+            readonly property real _pos: Math.min(value, 1.0)
             property bool _dragging: false
             property bool _clicking: false
             property bool _hovered: false
