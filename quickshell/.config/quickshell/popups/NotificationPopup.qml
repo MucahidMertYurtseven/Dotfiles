@@ -151,7 +151,8 @@ Item {
 
                             // Önem derecesi çizgisi (toast ile uyumlu)
                             Rectangle {
-                                width: 3; height: parent.height; radius: 1.5
+                                width: 3; height: 40; radius: 1.5
+                                Layout.alignment: Qt.AlignVCenter
                                 color: urgency === 2 ? (theme ? theme.warn : "#f38ba8")
                                      : urgency === 1 ? (theme ? theme.text : "#c5c5c5")
                                      : (theme ? theme.textMuted : "#7e8099")
