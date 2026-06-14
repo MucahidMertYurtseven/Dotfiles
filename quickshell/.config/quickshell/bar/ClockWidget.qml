@@ -233,22 +233,22 @@ Rectangle {
                     continue
                 }
 
-                var distanceToCenter = Math.abs((n / 2) - i) / (n / 2)
-                var bellCurve = 1.0 - (distanceToCenter * 0.25)
+                var bellCurve = 1.0 + 0.3 * Math.sin((i / n) * Math.PI * 2)
 
-                var fastWave = Math.abs(Math.sin(i * 4.0 + t * 0.5))
-                var slowWave = Math.abs(Math.cos(i * 2.0 - t * 0.2))
-                var noise = (fastWave * 0.55) + (slowWave * 0.45)
+                var fastWave = Math.abs(Math.sin(i * 6.0 + t * 0.9))
+                var midWave  = Math.abs(Math.cos(i * 3.5 - t * 0.5))
+                var slowWave = Math.abs(Math.sin(i * 1.5 + t * 0.3))
+                var noise = (fastWave * 0.4) + (midWave * 0.35) + (slowWave * 0.25)
 
-                var spike = (Math.random() > 0.8) ? 1.5 : 0.92
+                var spike = (Math.random() > 0.7) ? 1.8 : 0.9
 
                 var target = vol * noise * bellCurve * spike * 30
-                target = Math.max(2, Math.min(30, target))
+                target = Math.max(1, Math.min(30, target))
 
                 if (target > heights[i]) {
-                    heights[i] = heights[i] * 0.25 + target * 0.75
+                    heights[i] = heights[i] * 0.2 + target * 0.8
                 } else {
-                    heights[i] = heights[i] * 0.93 + target * 0.07
+                    heights[i] = heights[i] * 0.88 + target * 0.12
                 }
             }
 
