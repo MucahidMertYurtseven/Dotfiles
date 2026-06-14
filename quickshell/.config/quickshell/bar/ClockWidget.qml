@@ -222,7 +222,7 @@ Rectangle {
             var right = AudioLevelService.peakRight || 0
 
             var rawVol = Math.max(left, right)
-            var vol = Math.pow(rawVol, 1.33) * 0.7
+            var vol = Math.pow(rawVol, 1.2) * 0.85
 
             var t = _visTime++
 
