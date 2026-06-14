@@ -1,0 +1,8 @@
+module qs.services
+singleton AudioService 1.0 AudioService.qml
+singleton AudioLevelService 1.0 AudioLevelService.qml
+singleton BrightnessService 1.0 BrightnessService.qml
+singleton NetworkService 1.0 NetworkService.qml
+singleton PowerService 1.0 PowerService.qml
+singleton SystemService 1.0 SystemService.qml
+singleton AppState 1.0 AppState.qml
