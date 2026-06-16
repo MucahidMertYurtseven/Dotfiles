@@ -213,13 +213,6 @@ Rectangle {
 
             var heights = _barHeights.slice()
 
-            // Çalmıyorsa çubukları yavaşça sıfırla
-            if (!root._isPlaying) {
-                for (var k = 0; k < n; k++) heights[k] = heights[k] * 0.70
-                _barHeights = heights
-                return
-            }
-
             var left = AudioLevelService.peakLeft || 0
             var right = AudioLevelService.peakRight || 0
 
