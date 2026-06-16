@@ -338,15 +338,6 @@ ShellRoot {
             Item {
                 anchors.fill: parent
 
-                // Bar etrafinda yari saydam border
-                Rectangle {
-                    anchors.fill: parent
-                    radius: 14
-                    color: "transparent"
-                    border.color: liveTheme ? liveTheme.border : "#66343434"
-                    border.width: 1
-                }
-
                 // ESC tuşu ile popup kapatma
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Escape) {
