@@ -22,13 +22,14 @@ Rectangle {
     readonly property string _trackArtist: player ? player.trackArtist : ""
     readonly property bool _isPlaying: player ? player.isPlaying : false
     readonly property string _dispText: {
-        if (!player) return ""
-        var t = player.trackTitle
-        var a = player.trackArtist
-        if (t && a) return t + " - " + a
-        if (t) return t
-        if (a) return a
-        return ""
+        if (player) {
+            var t = player.trackTitle
+            var a = player.trackArtist
+            if (t && a) return t + " - " + a
+            if (t) return t
+            if (a) return a
+        }
+        return _showMedia ? "♫ No Player" : ""
     }
 
     // Kayan yazı (marquee) pozisyonu
@@ -49,7 +50,7 @@ Rectangle {
     Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
     property int _clockWidth: text.implicitWidth + 32
-    property int _targetWidth: _showMedia && _trackTitle ? 320 : _clockWidth
+    property int _targetWidth: _showMedia ? 320 : _clockWidth
     width: _targetWidth
     Behavior on width {
         NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
