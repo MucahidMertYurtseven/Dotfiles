@@ -38,7 +38,9 @@ Rectangle {
                 width: isActive ? 28 : 10   // aktif olan daha geniş
                 height: 10
                 radius: 5
-                color: isActive ? "#a6badd" : (isOccupied ? "#5376b6" : "#334c79")
+                color: isActive
+                    ? (theme ? theme.active : "#a6badd")
+                    : (isOccupied ? (theme ? theme.hover : "#5376b6") : (theme ? theme.empty : "#334c79"))
 
                 
                 Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
