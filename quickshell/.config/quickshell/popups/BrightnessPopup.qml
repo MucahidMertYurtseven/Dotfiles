@@ -22,9 +22,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#8c0c1a33"
+        color: theme ? theme.bgPopupBlur : "#b231112d"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#66374d75"; border.width: 1
+        border.color: theme ? theme.border : "#6675376d"; border.width: 1
     }
 
     ColumnLayout {
@@ -34,7 +34,7 @@ Item {
         // Cihaz adı
         Text {
             text: BrightnessService.deviceName
-            color: theme ? theme.textMuted : "#7f95bc"
+            color: theme ? theme.textMuted : "#bc7fb4"
             font.pixelSize: 10
             font.family: theme ? theme.fontFamily : "monospace"
             Layout.fillWidth: true
@@ -57,12 +57,12 @@ Item {
                 iconSize: 28
                 iconColor: root._val <= 0.05
                     ? (theme ? theme.warn : "#d09caa")
-                    : (theme ? theme.text : "#c2c3c6")
+                    : (theme ? theme.text : "#c6c2c5")
             }
 
             Text {
                 text: Math.round(root._val * 100) + "%"
-                color: theme ? theme.text : "#c2c3c6"
+                color: theme ? theme.text : "#c6c2c5"
                 font.pixelSize: 16
                 font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
@@ -73,7 +73,7 @@ Item {
         // Ayraç
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#66374d75"
+            color: theme ? theme.border : "#6675376d"
             opacity: 0.6
         }
 
@@ -107,7 +107,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 height: 8
                 radius: height / 2
-                color: theme ? theme.border : "#66374d75"
+                color: theme ? theme.border : "#6675376d"
 
                 transform: Scale { origin.y: 4; yScale: slider._scaleY }
 
@@ -118,7 +118,7 @@ Item {
                     anchors.bottom: parent.bottom
                     width: parent.width * slider._pos
                     radius: parent.radius
-                    color: theme ? theme.active : "#a6badd"
+                    color: theme ? theme.active : "#dda6d5"
 
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter

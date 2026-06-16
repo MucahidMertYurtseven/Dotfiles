@@ -110,9 +110,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#8c0c1a33"
+        color: theme ? theme.bgPopupBlur : "#b231112d"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#66374d75"; border.width: 1
+        border.color: theme ? theme.border : "#6675376d"; border.width: 1
     }
 
     ColumnLayout {
@@ -129,15 +129,15 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 10
-                    color: theme ? theme.empty : "#334c79"
+                    color: theme ? theme.empty : "#793370"
 
                     ColorizedIcon {
                         anchors.centerIn: parent
                         source: root._icons + "music-note-symbolic.svg"
                         iconSize: 28
                         iconColor: root.isPlaying
-                            ? (theme ? theme.active : "#a6badd")
-                            : (theme ? theme.text : "#c2c3c6")
+                            ? (theme ? theme.active : "#dda6d5")
+                            : (theme ? theme.text : "#c6c2c5")
                     }
                 }
             }
@@ -160,7 +160,7 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     text: root.trackArtist || "\u2014"
-                    color: theme ? theme.text : "#c2c3c6"
+                    color: theme ? theme.text : "#c6c2c5"
                     font.pixelSize: 11
                     font.family: theme ? theme.fontFamily : "monospace"
                     elide: Text.ElideRight
@@ -181,7 +181,7 @@ Item {
                 anchors.verticalCenterOffset: 2
                 height: 8
                 radius: height / 2
-                color: theme ? theme.border : "#66374d75"
+                color: theme ? theme.border : "#6675376d"
 
                 transform: Scale { origin.y: 4; yScale: root._progressScaleY }
 
@@ -191,7 +191,7 @@ Item {
                     anchors.bottom: parent.bottom
                     width: parent.width * root.displayProgress
                     radius: parent.radius
-                    color: theme ? theme.active : "#a6badd"
+                    color: theme ? theme.active : "#dda6d5"
 
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -212,7 +212,7 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: -10
                 text: root.formatTime(root.displayPos)
-                color: theme ? theme.text : "#c2c3c6"
+                color: theme ? theme.text : "#c6c2c5"
                 font.pixelSize: 11
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -222,7 +222,7 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: -10
                 text: root.formatTime(root.len)
-                color: theme ? theme.text : "#c2c3c6"
+                color: theme ? theme.text : "#c6c2c5"
                 font.pixelSize: 11
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -283,8 +283,8 @@ Item {
                     source: root._icons + "media-skip-backward-symbolic.svg"
                     iconSize: 22
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.active : "#a6badd")
-                        : (theme ? theme.empty : "#334c79")
+                        ? (theme ? theme.active : "#dda6d5")
+                        : (theme ? theme.empty : "#793370")
                 }
 
                 MouseArea {
@@ -311,8 +311,8 @@ Item {
                         : root._icons + "media-playback-start-symbolic.svg"
                     iconSize: 30
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.active : "#a6badd")
-                        : (theme ? theme.empty : "#334c79")
+                        ? (theme ? theme.active : "#dda6d5")
+                        : (theme ? theme.empty : "#793370")
                 }
 
                 MouseArea {
@@ -337,8 +337,8 @@ Item {
                     source: root._icons + "media-skip-forward-symbolic.svg"
                     iconSize: 22
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.active : "#a6badd")
-                        : (theme ? theme.empty : "#334c79")
+                        ? (theme ? theme.active : "#dda6d5")
+                        : (theme ? theme.empty : "#793370")
                 }
 
                 MouseArea {
@@ -364,7 +364,7 @@ Item {
                 iconSize: 14
                 iconColor: (Pipewire.defaultAudioSink?.audio?.muted ?? false)
                     ? (theme ? theme.warn : "#d09caa")
-                    : (theme ? theme.text : "#c2c3c6")
+                    : (theme ? theme.text : "#c6c2c5")
             }
 
             // Ses slider'ı
@@ -394,7 +394,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     height: 8
                     radius: height / 2
-                    color: theme ? theme.border : "#66374d75"
+                    color: theme ? theme.border : "#6675376d"
 
                     transform: Scale { origin.y: 4; yScale: volSlider._scaleY }
 
@@ -404,7 +404,7 @@ Item {
                         anchors.bottom: parent.bottom
                         width: parent.width * volSlider._pos
                         radius: parent.radius
-                        color: theme ? theme.active : "#a6badd"
+                        color: theme ? theme.active : "#dda6d5"
 
                         Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter

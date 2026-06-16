@@ -10,7 +10,7 @@ Item {
     Rectangle {
         anchors.centerIn: parent
         width: 1; height: 22
-        color: theme ? theme.border : "#66374d75"
+        color: theme ? theme.border : "#6675376d"
         opacity: 0.6
     }
 }

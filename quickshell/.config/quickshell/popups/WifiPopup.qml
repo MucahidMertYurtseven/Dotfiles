@@ -24,9 +24,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#8c0c1a33"
+        color: theme ? theme.bgPopupBlur : "#b231112d"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#66374d75"; border.width: 1
+        border.color: theme ? theme.border : "#6675376d"; border.width: 1
         clip: true
     }
 
@@ -45,8 +45,8 @@ Item {
                     : root._icon + "network-wireless-signal-none-symbolic.svg"
                 iconSize: 18
                 iconColor: NetworkService.enabled
-                    ? (theme ? theme.text : "#c2c3c6")
-                    : (theme ? theme.textMuted : "#7f95bc")
+                    ? (theme ? theme.text : "#c6c2c5")
+                    : (theme ? theme.textMuted : "#bc7fb4")
             }
 
             Text {
@@ -56,8 +56,8 @@ Item {
                     return "Wi-Fi Açık"
                 }
                 color: NetworkService.enabled
-                    ? (theme ? theme.text : "#c2c3c6")
-                    : (theme ? theme.textMuted : "#7f95bc")
+                    ? (theme ? theme.text : "#c6c2c5")
+                    : (theme ? theme.textMuted : "#bc7fb4")
                 font.pixelSize: 13
                 font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
@@ -69,12 +69,12 @@ Item {
             Rectangle {
                 width: 44; height: 24; radius: 12
                 color: NetworkService.enabled
-                    ? (theme ? theme.active : "#a6badd")
-                    : (theme ? theme.empty : "#334c79")
+                    ? (theme ? theme.active : "#dda6d5")
+                    : (theme ? theme.empty : "#793370")
                 Rectangle {
                     x: NetworkService.enabled ? parent.width - width - 2 : 2; y: 2
                     width: 20; height: 20; radius: 10
-                    color: NetworkService.enabled ? "#ffffff" : (theme ? theme.text : "#c2c3c6")
+                    color: NetworkService.enabled ? "#ffffff" : (theme ? theme.text : "#c6c2c5")
                     Behavior on x { NumberAnimation { duration: 150 } }
                 }
                 MouseArea {
@@ -88,14 +88,14 @@ Item {
         // Ayraç
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#66374d75"
+            color: theme ? theme.border : "#6675376d"
             opacity: 0.6
         }
 
         // Alt başlık
         Text {
             text: NetworkService.enabled ? "Ağlar" : "Wi-Fi kapalıyken ağlar gösterilmez"
-            color: theme ? theme.textMuted : "#7f95bc"
+            color: theme ? theme.textMuted : "#bc7fb4"
             font.pixelSize: 10
             font.family: theme ? theme.fontFamily : "monospace"
         }
@@ -121,7 +121,7 @@ Item {
                         implicitHeight: 36
                         radius: 6
                         color: modelData?.connected || wifiHover.containsMouse
-                            ? (theme ? theme.hover : "#5376b6")
+                            ? (theme ? theme.hover : "#b653a8")
                             : "transparent"
 
                         RowLayout {
@@ -138,7 +138,7 @@ Item {
                                     if (sig > 25) return "󰤢"
                                     return "󰤟"
                                 }
-                                color: theme ? theme.text : "#c2c3c6"
+                                color: theme ? theme.text : "#c6c2c5"
                                 font.pixelSize: 14
                                 font.family: theme ? theme.fontFamily : "monospace"
                             }
@@ -148,7 +148,7 @@ Item {
                                 text: modelData?.name ?? ""
                                 color: modelData?.connected
                                     ? (theme ? theme.textBright : "#f7f7f7")
-                                    : (theme ? theme.text : "#c2c3c6")
+                                    : (theme ? theme.text : "#c6c2c5")
                                 font.pixelSize: 12
                                 font.family: theme ? theme.fontFamily : "monospace"
                                 Layout.fillWidth: true

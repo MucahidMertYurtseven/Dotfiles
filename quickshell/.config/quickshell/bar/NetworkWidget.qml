@@ -21,9 +21,9 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgBar : "#7f0c1a33"
+        color: theme ? theme.bgBar : "#7f31112d"
         radius: 14
-        border.color: theme ? theme.border : "#66343434"
+        border.color: theme ? theme.border : "#6675376d"
         border.width: 1
         Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
@@ -41,7 +41,7 @@ Item {
                         ? root._icon + "network-wireless-signal-excellent-symbolic.svg"
                         : root._icon + "network-wireless-signal-none-symbolic.svg"
                     iconSize: 16
-                    iconColor: theme ? theme.active : "#a6badd"
+                    iconColor: theme ? theme.active : "#dda6d5"
                 }
                 MouseArea {
                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
@@ -51,7 +51,7 @@ Item {
 
             // Ayraç
             Item { width: 8; height: 32
-                Rectangle { anchors.centerIn: parent; width: 1; height: 18; color: theme ? theme.border : "#66374d75"; opacity: 0.5 }
+                Rectangle { anchors.centerIn: parent; width: 1; height: 18; color: theme ? theme.border : "#6675376d"; opacity: 0.5 }
             }
 
             // Bluetooth ikonu
@@ -63,7 +63,7 @@ Item {
                         ? root._icon + "network-bluetooth-activated-symbolic.svg"
                         : root._icon + "network-bluetooth-inactive-symbolic.svg"
                     iconSize: 18
-                    iconColor: theme ? theme.active : "#a6badd"
+                    iconColor: theme ? theme.active : "#dda6d5"
                 }
                 MouseArea {
                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true

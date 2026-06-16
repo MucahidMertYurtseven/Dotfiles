@@ -22,9 +22,9 @@ Item {
     // Bar modülü arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgBar : "#7f0c1a33"
+        color: theme ? theme.bgBar : "#7f31112d"
         radius: 14
-        border.color: theme ? theme.border : "#66343434"
+        border.color: theme ? theme.border : "#6675376d"
         border.width: 1
         Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
@@ -43,7 +43,7 @@ Item {
                 iconSize: 18
                 iconColor: AppState.dndEnabled
                     ? (theme ? theme.warn : "#d09caa")
-                    : (theme ? theme.active : "#a6badd")
+                    : (theme ? theme.active : "#dda6d5")
             }
 
             MouseArea {

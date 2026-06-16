@@ -14,9 +14,9 @@ Rectangle {
     height: 32
     width: wsRow.width + 24
     Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-    color: theme ? theme.bgBar : "#7f0c1a33"
+    color: theme ? theme.bgBar : "#7f31112d"
     radius: 14
-    border.color: theme ? theme.border : "#66343434"
+    border.color: theme ? theme.border : "#6675376d"
     border.width: 1
     Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 

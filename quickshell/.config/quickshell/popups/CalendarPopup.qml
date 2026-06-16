@@ -25,9 +25,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#8c0c1a33"
+        color: theme ? theme.bgPopupBlur : "#b231112d"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#66374d75"; border.width: 1
+        border.color: theme ? theme.border : "#6675376d"; border.width: 1
     }
 
     ColumnLayout {
@@ -58,7 +58,7 @@ Item {
                 var months = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"]
                 return d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear()
             }
-            color: theme ? theme.textMuted : "#7f95bc"
+            color: theme ? theme.textMuted : "#bc7fb4"
             font.pixelSize: 14
             font.family: theme ? theme.fontFamily : "monospace"
         }
@@ -66,7 +66,7 @@ Item {
         // Ayraç
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#66374d75"
+            color: theme ? theme.border : "#6675376d"
             opacity: 0.6
             Layout.topMargin: 2; Layout.bottomMargin: 2
         }
@@ -82,7 +82,7 @@ Item {
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignHCenter
                     text: modelData
-                    color: theme ? theme.textMuted : "#7f95bc"
+                    color: theme ? theme.textMuted : "#bc7fb4"
                     font.pixelSize: 10
                     font.family: theme ? theme.fontFamily : "monospace"
                 }
@@ -121,7 +121,7 @@ Item {
                         height: Math.min(26, parent.height - 2)
                         radius: Math.min(width, height) / 2
                         visible: modelData > 0 && modelData === root._now.getDate()
-                        color: theme ? theme.active : "#a6badd"
+                        color: theme ? theme.active : "#dda6d5"
                     }
 
                     // Gün numarası
@@ -130,7 +130,7 @@ Item {
                         text: modelData > 0 ? modelData.toString() : ""
                         color: modelData > 0 && modelData === root._now.getDate()
                             ? "#000000"
-                            : (theme ? theme.text : "#c2c3c6")
+                            : (theme ? theme.text : "#c6c2c5")
                         font.pixelSize: 12
                         font.family: theme ? theme.fontFamily : "monospace"
                         horizontalAlignment: Text.AlignHCenter

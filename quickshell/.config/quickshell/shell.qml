@@ -82,10 +82,6 @@ ShellRoot {
                 liveTheme.green       = t.green
                 t.destroy()
             }
-            // Workspace/icon renkleri gri degil canli mavi olsun
-            liveTheme.active = "#a6badd"
-            liveTheme.hover = "#5376b6"
-            liveTheme.empty = "#334c79"
         }
 
         property int revision: 0

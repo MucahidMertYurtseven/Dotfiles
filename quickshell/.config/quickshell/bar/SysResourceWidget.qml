@@ -17,9 +17,9 @@ Rectangle {
     implicitWidth: row.implicitWidth + 16
     visible: SystemService.ramUsed > 0
 
-    color: theme ? theme.bgBar : "#7f0c1a33"
+    color: theme ? theme.bgBar : "#7f31112d"
     radius: 14
-    border.color: theme ? theme.border : "#66343434"
+    border.color: theme ? theme.border : "#6675376d"
     border.width: 1
     Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
@@ -34,12 +34,12 @@ Rectangle {
             ColorizedIcon {
                 source: root._icon + "computer-symbolic.svg"
                 iconSize: 18
-                iconColor: SystemService.cpuLoad > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#a6badd")
+                iconColor: SystemService.cpuLoad > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#dda6d5")
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
                 text: Math.round(SystemService.cpuLoad) + "%"
-                color: SystemService.cpuLoad > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c2c3c6")
+                color: SystemService.cpuLoad > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c6c2c5")
                 font.pixelSize: 14; font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -51,12 +51,12 @@ Rectangle {
             ColorizedIcon {
                 source: root._icon + "drive-harddisk-symbolic.svg"
                 iconSize: 18
-                iconColor: SystemService.ramUsed > 0.8 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#a6badd")
+                iconColor: SystemService.ramUsed > 0.8 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#dda6d5")
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
                 text: Math.round(SystemService.ramUsed * 100) + "%"
-                color: SystemService.ramUsed > 0.8 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c2c3c6")
+                color: SystemService.ramUsed > 0.8 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c6c2c5")
                 font.pixelSize: 14; font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -69,12 +69,12 @@ Rectangle {
             ColorizedIcon {
                 source: root._icon + "temperature-normal-symbolic.svg"
                 iconSize: 18
-                iconColor: SystemService.temp > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#a6badd")
+                iconColor: SystemService.temp > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#dda6d5")
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
                 text: SystemService.temp + "\u00B0"
-                color: SystemService.temp > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c2c3c6")
+                color: SystemService.temp > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c6c2c5")
                 font.pixelSize: 14; font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
             }
