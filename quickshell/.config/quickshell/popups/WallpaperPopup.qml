@@ -61,8 +61,9 @@ Item {
                 "find \"$d\" -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \\) 2>/dev/null; " +
             "done | sort -u | while IFS= read -r f; do " +
                 "t=\"" + root.thumbDir + "/$(basename \"$f\")\"; " +
-                "[ -f \"$t\" ] && continue; " +
+                "[ -s \"$t\" ] && continue; " +
                 "magick \"$f\" -resize 300x300^ -quality 60 \"$t\" 2>/dev/null; " +
+                "[ -s \"$t\" ] || rm -f \"$t\"; " +
             "done"]);
     }
 
