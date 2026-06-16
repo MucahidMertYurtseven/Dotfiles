@@ -59,6 +59,12 @@ hl.layer_rule({
     ignore_alpha = 0.1,
 })
 
+hl.layer_rule({
+    match = { namespace = "quickshell:popup" },
+    blur = true,
+    ignore_alpha = 0.1,
+})
+
 hl.curve("directional_jiggle", { type = "bezier", points = { {0.05, 0.9}, {0.1, 1.09} } })
 hl.curve("clean_popin", {        type = "bezier", points = { {0.05, 0.9}, {0.1, 1.0} } })
 hl.curve("easeOutCubic", {       type = "bezier", points = { {0.215, 0.61}, {0.355, 1.0} } })

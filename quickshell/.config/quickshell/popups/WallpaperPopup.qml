@@ -8,9 +8,9 @@ Item {
     id: root
     property Item palette: null
 
-    readonly property color bgColor:   palette ? palette.bgPopup : "#2e2e2e"
-    readonly property color textColor: palette ? palette.text  : "#c5c5c5"
-    readonly property color border:    palette ? palette.border : "#66343434"
+    readonly property color bgColor:   palette ? palette.bgPopupBlur : "#90242424"
+    readonly property color textColor: palette ? palette.text  : "#c2c3c6"
+    readonly property color border:    palette ? palette.border : "#66374d75"
     readonly property string fontFamily: palette ? palette.fontFamily : "JetBrainsMono Nerd Font"
 
     readonly property string srcDir: {
