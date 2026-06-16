@@ -23,19 +23,33 @@ ShellRoot {
         id: liveTheme
 
         property color bgDark:      "#242424"
+        Behavior on bgDark      { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color bgBar:       "#40242424"
+        Behavior on bgBar       { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color bgPopup:     "#2e2e2e"
+        Behavior on bgPopup     { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color bgPopupBlur: "#99242424"
+        Behavior on bgPopupBlur { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color text:        "#c5c5c5"
+        Behavior on text        { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color textBright:  "#f7f7f7"
+        Behavior on textBright  { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color textMuted:   "#808080"
+        Behavior on textMuted   { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color border:      "#66343434"
+        Behavior on border      { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color hover:       "#5376b6"
+        Behavior on hover       { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color active:      "#a6badd"
+        Behavior on active      { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color activeText:  "#272727"
+        Behavior on activeText  { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color empty:       "#334c79"
+        Behavior on empty       { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color warn:        "#f38ba8"
+        Behavior on warn        { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color green:       "#4ade80"
+        Behavior on green       { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
 
         readonly property color base:     liveTheme.bgDark
         readonly property color mantle:   liveTheme.bgPopup
