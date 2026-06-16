@@ -11,7 +11,7 @@ import qs.components
 
 Item {
     id: root
-    property var theme: null
+    property Item theme: null
     property bool open: false
 
     readonly property string _icon: Quickshell.shellDir + "/bar/icons/"
@@ -24,9 +24,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#202020"
+        color: theme ? theme.bgPopupBlur : "#8c0c1a33"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#323232"; border.width: 1
+        border.color: theme ? theme.border : "#66374d75"; border.width: 1
         clip: true
     }
 
@@ -45,8 +45,8 @@ Item {
                     : root._icon + "network-wireless-signal-none-symbolic.svg"
                 iconSize: 18
                 iconColor: NetworkService.enabled
-                    ? (theme ? theme.text : "#c5c5c5")
-                    : (theme ? theme.textMuted : "#7e8099")
+                    ? (theme ? theme.text : "#c2c3c6")
+                    : (theme ? theme.textMuted : "#7f95bc")
             }
 
             Text {
@@ -56,8 +56,8 @@ Item {
                     return "Wi-Fi Açık"
                 }
                 color: NetworkService.enabled
-                    ? (theme ? theme.text : "#c5c5c5")
-                    : (theme ? theme.textMuted : "#7e8099")
+                    ? (theme ? theme.text : "#c2c3c6")
+                    : (theme ? theme.textMuted : "#7f95bc")
                 font.pixelSize: 13
                 font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
@@ -69,12 +69,12 @@ Item {
             Rectangle {
                 width: 44; height: 24; radius: 12
                 color: NetworkService.enabled
-                    ? (theme ? theme.active : "#b0b0b0")
-                    : (theme ? theme.empty : "#414141")
+                    ? (theme ? theme.active : "#a6badd")
+                    : (theme ? theme.empty : "#334c79")
                 Rectangle {
                     x: NetworkService.enabled ? parent.width - width - 2 : 2; y: 2
                     width: 20; height: 20; radius: 10
-                    color: NetworkService.enabled ? "#ffffff" : (theme ? theme.text : "#c5c5c5")
+                    color: NetworkService.enabled ? "#ffffff" : (theme ? theme.text : "#c2c3c6")
                     Behavior on x { NumberAnimation { duration: 150 } }
                 }
                 MouseArea {
@@ -88,14 +88,14 @@ Item {
         // Ayraç
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#323232"
+            color: theme ? theme.border : "#66374d75"
             opacity: 0.6
         }
 
         // Alt başlık
         Text {
             text: NetworkService.enabled ? "Ağlar" : "Wi-Fi kapalıyken ağlar gösterilmez"
-            color: theme ? theme.textMuted : "#7e8099"
+            color: theme ? theme.textMuted : "#7f95bc"
             font.pixelSize: 10
             font.family: theme ? theme.fontFamily : "monospace"
         }
@@ -121,7 +121,7 @@ Item {
                         implicitHeight: 36
                         radius: 6
                         color: modelData?.connected || wifiHover.containsMouse
-                            ? (theme ? theme.hover : "#606060")
+                            ? (theme ? theme.hover : "#5376b6")
                             : "transparent"
 
                         RowLayout {
@@ -138,7 +138,7 @@ Item {
                                     if (sig > 25) return "󰤢"
                                     return "󰤟"
                                 }
-                                color: theme ? theme.text : "#c5c5c5"
+                                color: theme ? theme.text : "#c2c3c6"
                                 font.pixelSize: 14
                                 font.family: theme ? theme.fontFamily : "monospace"
                             }
@@ -147,8 +147,8 @@ Item {
                             Text {
                                 text: modelData?.name ?? ""
                                 color: modelData?.connected
-                                    ? (theme ? theme.textBright : "#ffffff")
-                                    : (theme ? theme.text : "#c5c5c5")
+                                    ? (theme ? theme.textBright : "#f7f7f7")
+                                    : (theme ? theme.text : "#c2c3c6")
                                 font.pixelSize: 12
                                 font.family: theme ? theme.fontFamily : "monospace"
                                 Layout.fillWidth: true
@@ -158,32 +158,8 @@ Item {
                             // Bağlıysa yeşil nokta
                             Text {
                                 text: modelData?.connected ? "\u25CF" : ""
-                                color: theme ? theme.green : "#4ade80"
+                                color: theme ? theme.green : "#78c293"
                                 font.pixelSize: 10
-                            }
-
-                            // Bağlanma düğmesi (bağlı değilse)
-                            Rectangle {
-                                width: 28; height: 22; radius: 4
-                                color: theme ? theme.hover : "#606060"
-                                border.color: theme ? theme.border : "#323232"
-                                border.width: 1
-                                visible: !modelData?.connected
-
-                                ColorizedIcon {
-                                    anchors.centerIn: parent
-                                    source: root._icon + "network-wireless-signal-excellent-symbolic.svg"
-                                    iconSize: 10
-                                    iconColor: theme ? theme.text : "#c5c5c5"
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        if (modelData) NetworkService.connectTo(modelData.name)
-                                    }
-                                }
                             }
                         }
 
@@ -192,6 +168,10 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (modelData && !modelData.connected)
+                                    NetworkService.connectTo(modelData.name)
+                            }
                         }
                     }
                 }

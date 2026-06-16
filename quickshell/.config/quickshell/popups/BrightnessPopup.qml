@@ -10,7 +10,7 @@ import qs.components
 
 Item {
     id: root
-    property var theme: null
+    property Item theme: null
 
     readonly property string _icon: Quickshell.shellDir + "/bar/icons/"
     property bool open: false
@@ -22,9 +22,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#202020"
+        color: theme ? theme.bgPopupBlur : "#8c0c1a33"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#323232"; border.width: 1
+        border.color: theme ? theme.border : "#66374d75"; border.width: 1
     }
 
     ColumnLayout {
@@ -34,7 +34,7 @@ Item {
         // Cihaz adı
         Text {
             text: BrightnessService.deviceName
-            color: theme ? theme.textMuted : "#7e8099"
+            color: theme ? theme.textMuted : "#7f95bc"
             font.pixelSize: 10
             font.family: theme ? theme.fontFamily : "monospace"
             Layout.fillWidth: true
@@ -56,13 +56,13 @@ Item {
                 }
                 iconSize: 28
                 iconColor: root._val <= 0.05
-                    ? (theme ? theme.warn : "#f38ba8")
-                    : (theme ? theme.text : "#c5c5c5")
+                    ? (theme ? theme.warn : "#d09caa")
+                    : (theme ? theme.text : "#c2c3c6")
             }
 
             Text {
                 text: Math.round(root._val * 100) + "%"
-                color: theme ? theme.text : "#c5c5c5"
+                color: theme ? theme.text : "#c2c3c6"
                 font.pixelSize: 16
                 font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
@@ -73,7 +73,7 @@ Item {
         // Ayraç
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#323232"
+            color: theme ? theme.border : "#66374d75"
             opacity: 0.6
         }
 
@@ -107,7 +107,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 height: 8
                 radius: height / 2
-                color: theme ? theme.border : "#323232"
+                color: theme ? theme.border : "#66374d75"
 
                 transform: Scale { origin.y: 4; yScale: slider._scaleY }
 
@@ -118,7 +118,7 @@ Item {
                     anchors.bottom: parent.bottom
                     width: parent.width * slider._pos
                     radius: parent.radius
-                    color: theme ? theme.active : "#b0b0b0"
+                    color: theme ? theme.active : "#a6badd"
 
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter

@@ -4,7 +4,6 @@
 
 local terminal    = "kitty"
 local fileManager = "thunar"
-local menu        = "wofi --show drun"
 
 
 ---------------------
@@ -22,7 +21,8 @@ hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("touch /tmp/quickshell-launcher"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("touch /tmp/quickshell-wallpaper"))
 hl.bind("CTRL + ALT + P", hl.dsp.exec_cmd(" quickshell -c /home/mert/.config/quickshell/HyprQuickFrame/ -n"))
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("sh -c 'cliphist list | wofi --dmenu --show dmenu -p \"Pano: \" | cliphist decode | wl-copy'"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("/home/mert/.config/quickshell/lockscreen/lock.sh"))

@@ -10,7 +10,7 @@ import qs.components
 
 Item {
     id: root
-    property var theme: null
+    property Item theme: null
 
     readonly property string _icon: Quickshell.shellDir + "/bar/icons/"
     property bool open: false
@@ -23,9 +23,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#202020"
+        color: theme ? theme.bgPopupBlur : "#8c0c1a33"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#323232"; border.width: 1
+        border.color: theme ? theme.border : "#66374d75"; border.width: 1
     }
 
     ColumnLayout {
@@ -35,7 +35,7 @@ Item {
         // Ses cihaz adı
         Text {
             text: Pipewire.defaultAudioSink?.description ?? Pipewire.defaultAudioSink?.name ?? "Ses"
-            color: theme ? theme.textMuted : "#7e8099"
+            color: theme ? theme.textMuted : "#7f95bc"
             font.pixelSize: 10
             font.family: theme ? theme.fontFamily : "monospace"
             Layout.fillWidth: true
@@ -55,12 +55,12 @@ Item {
                     return root._icon + "audio-volume-medium-symbolic.svg"
                 }
                 iconSize: 28
-                iconColor: root.muted ? (theme ? theme.warn : "#f38ba8") : (theme ? theme.text : "#c5c5c5")
+                iconColor: root.muted ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c2c3c6")
             }
 
             Text {
                 text: root.muted ? "Sessiz" : Math.round(root.vol * 100) + "%"
-                color: theme ? theme.text : "#c5c5c5"
+                color: theme ? theme.text : "#c2c3c6"
                 font.pixelSize: 16
                 font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
@@ -70,14 +70,14 @@ Item {
             // Mute toggle düğmesi
             Rectangle {
                 width: 40; height: 30; radius: 6
-                color: root.muted ? (theme ? theme.hover : "#606060") : (theme ? theme.empty : "#414141")
-                border.color: theme ? theme.border : "#323232"
+                color: root.muted ? (theme ? theme.hover : "#5376b6") : (theme ? theme.empty : "#334c79")
+                border.color: theme ? theme.border : "#66374d75"
                 border.width: 1
                 ColorizedIcon {
                     anchors.centerIn: parent
                     source: root.muted ? root._icon + "audio-volume-muted-symbolic.svg" : root._icon + "audio-volume-high-symbolic.svg"
                     iconSize: 16
-                    iconColor: root.muted ? (theme ? theme.warn : "#f38ba8") : (theme ? theme.text : "#c5c5c5")
+                    iconColor: root.muted ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c2c3c6")
                 }
                 MouseArea {
                     anchors.fill: parent
@@ -93,7 +93,7 @@ Item {
         // Ayraç
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#323232"
+            color: theme ? theme.border : "#66374d75"
             opacity: 0.6
         }
 
@@ -126,7 +126,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 height: 8
                 radius: height / 2
-                color: theme ? theme.border : "#323232"
+                color: theme ? theme.border : "#66374d75"
 
                 transform: Scale { origin.y: 4; yScale: slider._scaleY }
 
@@ -137,7 +137,7 @@ Item {
                     anchors.bottom: parent.bottom
                     width: parent.width * slider._pos
                     radius: parent.radius
-                    color: theme ? theme.active : "#b0b0b0"
+                    color: theme ? theme.active : "#a6badd"
 
                     // Parlaklık efekti
                     Rectangle {

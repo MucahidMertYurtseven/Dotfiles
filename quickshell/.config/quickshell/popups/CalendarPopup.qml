@@ -3,12 +3,13 @@
 // Her saniye güncellenir, güncel günü vurgular
 // ============================================================
 import QtQuick
+import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
 Item {
     id: root
-    property var theme: null
+    property Item theme: null
     property bool open: false
 
     anchors.fill: parent
@@ -24,9 +25,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#202020"
+        color: theme ? theme.bgPopupBlur : "#8c0c1a33"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#323232"; border.width: 1
+        border.color: theme ? theme.border : "#66374d75"; border.width: 1
     }
 
     ColumnLayout {
@@ -43,7 +44,7 @@ Item {
                 var s = d.getSeconds().toString().padStart(2, "0")
                 return h + ":" + m + ":" + s
             }
-            color: theme ? theme.textBright : "#ffffff"
+            color: theme ? theme.textBright : "#f7f7f7"
             font.pixelSize: 28
             font.bold: true
             font.family: theme ? theme.fontFamily : "monospace"
@@ -57,7 +58,7 @@ Item {
                 var months = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"]
                 return d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear()
             }
-            color: theme ? theme.textMuted : "#7e8099"
+            color: theme ? theme.textMuted : "#7f95bc"
             font.pixelSize: 14
             font.family: theme ? theme.fontFamily : "monospace"
         }
@@ -65,7 +66,7 @@ Item {
         // Ayraç
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#323232"
+            color: theme ? theme.border : "#66374d75"
             opacity: 0.6
             Layout.topMargin: 2; Layout.bottomMargin: 2
         }
@@ -81,7 +82,7 @@ Item {
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignHCenter
                     text: modelData
-                    color: theme ? theme.textMuted : "#7e8099"
+                    color: theme ? theme.textMuted : "#7f95bc"
                     font.pixelSize: 10
                     font.family: theme ? theme.fontFamily : "monospace"
                 }
@@ -120,7 +121,7 @@ Item {
                         height: Math.min(26, parent.height - 2)
                         radius: Math.min(width, height) / 2
                         visible: modelData > 0 && modelData === root._now.getDate()
-                        color: theme ? theme.active : "#b0b0b0"
+                        color: theme ? theme.active : "#a6badd"
                     }
 
                     // Gün numarası
@@ -129,7 +130,7 @@ Item {
                         text: modelData > 0 ? modelData.toString() : ""
                         color: modelData > 0 && modelData === root._now.getDate()
                             ? "#000000"
-                            : (theme ? theme.text : "#c5c5c5")
+                            : (theme ? theme.text : "#c2c3c6")
                         font.pixelSize: 12
                         font.family: theme ? theme.fontFamily : "monospace"
                         horizontalAlignment: Text.AlignHCenter

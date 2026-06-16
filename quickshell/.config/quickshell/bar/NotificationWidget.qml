@@ -10,7 +10,7 @@ import qs.components
 
 Item {
     id: root
-    property var theme: null
+    property Item theme: null
 
     signal notifyClicked()
 
@@ -22,10 +22,11 @@ Item {
     // Bar modülü arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgDark : "#202020"
+        color: theme ? theme.bgBar : "#7f0c1a33"
         radius: 14
-        border.color: theme ? theme.border : "#323232"
+        border.color: theme ? theme.border : "#66343434"
         border.width: 1
+        Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
         Item {
             id: notifInner
@@ -41,13 +42,13 @@ Item {
                     : root._icon + "notifications-symbolic.svg"
                 iconSize: 18
                 iconColor: AppState.dndEnabled
-                    ? (theme ? theme.warn : "#f38ba8")
-                    : (theme ? theme.text : "#c5c5c5")
+                    ? (theme ? theme.warn : "#d09caa")
+                    : (theme ? theme.active : "#a6badd")
             }
 
             MouseArea {
-                anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                onPressed: root.notifyClicked()
+                anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                onClicked: root.notifyClicked()
             }
         }
     }

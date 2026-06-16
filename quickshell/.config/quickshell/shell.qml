@@ -18,8 +18,114 @@ import qs.components
 ShellRoot {
     id: root
 
-    // Tema nesnesi — tüm bileşenler buradan renk/font alır
-    Theme { id: theme }
+    // Canlı tema — JSON dosyası değişince güncellenir, reload olmaz
+    Item {
+        id: liveTheme
+
+        property color bgDark:      "#242424"
+        property color bgBar:       "#40242424"
+        property color bgPopup:     "#2e2e2e"
+        property color bgPopupBlur: "#99242424"
+        property color text:        "#c5c5c5"
+        property color textBright:  "#f7f7f7"
+        property color textMuted:   "#808080"
+        property color border:      "#66343434"
+        property color hover:       "#5376b6"
+        property color active:      "#a6badd"
+        property color activeText:  "#272727"
+        property color empty:       "#334c79"
+        property color warn:        "#f38ba8"
+        property color green:       "#4ade80"
+
+        readonly property color base:     liveTheme.bgDark
+        readonly property color mantle:   liveTheme.bgPopup
+        readonly property color surface1: liveTheme.empty
+        readonly property color surface2: liveTheme.hover
+
+        readonly property int barHeight:    50
+        readonly property int moduleRadius: 8
+        readonly property int moduleHeight: 16
+        readonly property int popupRadius:  12
+        readonly property int popupPad:     12
+        readonly property int popupWidth:   320
+
+        readonly property string fontFamily: "JetBrainsMono Nerd Font"
+
+        Component.onCompleted: {
+            var comp = Qt.createComponent("./bar/Theme.qml")
+            if (comp.status === Component.Ready) {
+                var t = comp.createObject(null)
+                liveTheme.bgDark      = t.bgDark
+                liveTheme.bgBar       = t.bgBar
+                liveTheme.bgPopup     = t.bgPopup
+                liveTheme.bgPopupBlur = t.bgPopupBlur
+                liveTheme.text        = t.text
+                liveTheme.textBright  = t.textBright
+                liveTheme.textMuted   = t.textMuted
+                liveTheme.border      = t.border
+                liveTheme.activeText  = t.activeText
+                liveTheme.warn        = t.warn
+                liveTheme.green       = t.green
+                t.destroy()
+            }
+            // Workspace/icon renkleri gri degil canli mavi olsun
+            liveTheme.active = "#a6badd"
+            liveTheme.hover = "#5376b6"
+            liveTheme.empty = "#334c79"
+        }
+
+        property int revision: 0
+    }
+
+    // Tema JSON dosyasını izle — generate_theme.py --live bu dosyayı yazar
+    property string _lastThemeJson: ""
+    property bool _preloadedWallpaper: false
+    Timer {
+        running: true
+        interval: 4000
+        onTriggered: root._preloadedWallpaper = true
+    }
+    Timer {
+        id: themePoller
+        interval: 1500
+        running: true
+        repeat: true
+        onTriggered: { themeReader.running = true }
+    }
+    Process {
+        id: themeReader
+        command: ["sh", "-c", "cat /tmp/qs_theme.json 2>/dev/null || echo ''"]
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var raw = this.text.trim()
+                if (!raw || raw === root._lastThemeJson) return
+                root._lastThemeJson = raw
+                try {
+                    var p = JSON.parse(raw)
+                    var changed = 0
+                    if (p.bgDark      !== undefined) { liveTheme.bgDark      = p.bgDark;      changed++ }
+                    if (p.bgBar       !== undefined) { liveTheme.bgBar       = p.bgBar;       changed++ }
+                    if (p.bgPopup     !== undefined) { liveTheme.bgPopup     = p.bgPopup;     changed++ }
+                    if (p.bgPopupBlur !== undefined) { liveTheme.bgPopupBlur = p.bgPopupBlur; changed++ }
+                    if (p.text        !== undefined) { liveTheme.text        = p.text;        changed++ }
+                    if (p.textBright  !== undefined) { liveTheme.textBright  = p.textBright;  changed++ }
+                    if (p.textMuted   !== undefined) { liveTheme.textMuted   = p.textMuted;   changed++ }
+                    if (p.border      !== undefined) { liveTheme.border      = p.border;      changed++ }
+                    if (p.hover       !== undefined) { liveTheme.hover       = p.hover;       changed++ }
+                    if (p.active      !== undefined) { liveTheme.active      = p.active;      changed++ }
+                    if (p.activeText  !== undefined) { liveTheme.activeText  = p.activeText;  changed++ }
+                    if (p.empty       !== undefined) { liveTheme.empty       = p.empty;       changed++ }
+                    if (p.warn        !== undefined) { liveTheme.warn        = p.warn;        changed++ }
+                    if (p.green       !== undefined) { liveTheme.green       = p.green;       changed++ }
+                    liveTheme.revision++
+                    console.log("Theme file updated:", changed, "properties, rev:", liveTheme.revision)
+                } catch (e) {
+                    console.log("Theme file parse error:", String(e))
+                }
+            }
+        }
+    }
 
     // Aktif popup'ı kapat (AppState üzerinden)
     function closeActivePopup() {
@@ -29,6 +135,44 @@ ShellRoot {
     // Popup aç/kapat — aynı isme tekrar tıklanırsa kapat
     function openPopup(name) {
         AppState.activePopup = AppState.activePopup === name ? "" : name
+    }
+
+    // File-based launcher trigger (Hyprland bind touch eder)
+    property bool _launcherTriggered: false
+    Timer {
+        interval: 300
+        running: true
+        repeat: true
+        onTriggered: {
+            launcherCheck.running = true
+            wallpaperCheck.running = true
+        }
+    }
+    Process {
+        id: launcherCheck
+        command: ["sh", "-c", "if [ -f /tmp/quickshell-launcher ]; then rm /tmp/quickshell-launcher && echo 1; else echo 0; fi"]
+        running: false
+        stdout: SplitParser {
+            onRead: function(line) {
+                if (line.trim() === "1") {
+                    root.openPopup("launcher")
+                }
+            }
+        }
+    }
+
+    // File-based wallpaper trigger (Hyprland SUPER+W touch eder)
+    Process {
+        id: wallpaperCheck
+        command: ["sh", "-c", "if [ -f /tmp/quickshell-wallpaper ]; then rm /tmp/quickshell-wallpaper && echo 1; else echo 0; fi"]
+        running: false
+        stdout: SplitParser {
+            onRead: function(line) {
+                if (line.trim() === "1") {
+                    root.openPopup("wallpaper")
+                }
+            }
+        }
     }
 
     // Her popup tipi için genişlik döndür
@@ -44,6 +188,8 @@ ShellRoot {
             case "battery": return 320
             case "power": return 320
             case "media": return 320
+            case "launcher": return 400
+            case "wallpaper": return Screen.width * 0.60
             default: return 1
         }
     }
@@ -60,6 +206,8 @@ ShellRoot {
             case "battery": return 190
             case "power": return 225
             case "media": return 200
+            case "launcher": return 450
+            case "wallpaper": return Screen.height * 0.50
             default: return 1
         }
     }
@@ -190,6 +338,15 @@ ShellRoot {
             Item {
                 anchors.fill: parent
 
+                // Bar etrafinda yari saydam border
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 14
+                    color: "transparent"
+                    border.color: liveTheme ? liveTheme.border : "#66343434"
+                    border.width: 1
+                }
+
                 // ESC tuşu ile popup kapatma
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Escape) {
@@ -210,14 +367,14 @@ ShellRoot {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 6
-                    WorkspaceIndicator { theme: theme }
-                    SysResourceWidget { theme: theme }
+                    WorkspaceIndicator { theme: liveTheme }
+                    SysResourceWidget { theme: liveTheme }
                 }
 
                 // Orta bölüm: Saat / Medya bilgisi
                 ClockWidget {
                     id: clockWidget
-                    theme: theme
+                    theme: liveTheme
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     onClicked: {
@@ -232,22 +389,22 @@ ShellRoot {
                     spacing: 6
 
                     NotificationWidget {
-                        theme: theme
+                        theme: liveTheme
                         onNotifyClicked: root.openPopup("notifications")
                     }
                     NetworkWidget {
-                        theme: theme
+                        theme: liveTheme
                         onWifiClicked: root.openPopup("wifi")
                         onBluetoothClicked: root.openPopup("bluetooth")
                     }
                     SystemControlsWidget {
-                        theme: theme
+                        theme: liveTheme
                         onBatteryClicked: root.openPopup("battery")
                         onBrightnessClicked: root.openPopup("brightness")
                         onVolumeClicked: root.openPopup("volume")
                     }
                     PowerButtonWidget {
-                        theme: theme
+                        theme: liveTheme
                         onPowerClicked: root.openPopup("power")
                     }
                 }
@@ -268,9 +425,11 @@ ShellRoot {
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: AppState.activePopup !== "" ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-            // Popup dışına tıklayınca kapat
+            // Popup dışına tıklayınca kapat (bar alanını kapsamaz)
             MouseArea {
-                anchors.fill: parent
+                anchors.top: parent.top; anchors.topMargin: 48
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left; anchors.right: parent.right
                 onClicked: root.closeActivePopup()
             }
 
@@ -279,20 +438,18 @@ ShellRoot {
                 id: popupItem
                 width: popupWidth(AppState.activePopup) || 1
                 height: popupHeight(AppState.activePopup) || 1
-                anchors.top: parent.top; anchors.topMargin: 48
+                anchors.top: parent.top; anchors.topMargin: AppState.activePopup === "wallpaper" ? Math.max(48, (parent.height - height) / 2) : 48
                 anchors.right: parent.right; anchors.rightMargin: {
                     var p = AppState.activePopup
                     var w = popupWidth(p) || 1
-                    if (p === "" || p === "calendar" || p === "media") {
+                    if (p === "" || p === "calendar" || p === "media" || p === "launcher" || p === "wallpaper") {
                         return Math.floor((parent.width - w) / 2)
                     }
                     return 15
                 }
                 opacity: 0
-                scale: 0.85
+                scale: 0.88
                 transformOrigin: Item.Top
-                layer.enabled: true
-                layer.samplerName: "linear"
 
                 // ActivePopup değişince animasyonu tetikle
                 Connections {
@@ -300,7 +457,13 @@ ShellRoot {
                     function onActivePopupChanged() {
                         if (AppState.activePopup !== "") {
                             popupCloseAnim.stop()
-                            popupOpenAnim.restart()
+                            // Wallpaper popup manages its own animation
+                            if (AppState.activePopup !== "wallpaper") {
+                                popupOpenAnim.restart()
+                            } else {
+                                popupItem.scale = 1
+                                popupItem.opacity = 1
+                            }
                         } else {
                             popupOpenAnim.stop()
                             popupCloseAnim.restart()
@@ -308,44 +471,139 @@ ShellRoot {
                     }
                 }
 
-                // Açılma animasyonu (scale bounce + fade)
+                // Açılma animasyonu (scale + fade, OutCubic — bounce yok)
                 SequentialAnimation {
                     id: popupOpenAnim
                     running: false
-                    PropertyAction { target: popupItem; property: "scale"; value: 0.85 }
+                    PropertyAction { target: popupItem; property: "scale"; value: 0.88 }
                     PropertyAction { target: popupItem; property: "opacity"; value: 0 }
                     ParallelAnimation {
-                        NumberAnimation {
-                            target: popupItem; property: "scale"; duration: 450
-                            to: 1; easing.type: Easing.OutBack; easing.overshoot: 2.8
-                        }
-                        NumberAnimation { target: popupItem; property: "opacity"; duration: 350; to: 1; easing.type: Easing.OutCubic }
+                        NumberAnimation { target: popupItem; property: "scale"; duration: 300; to: 1; easing.type: Easing.OutCubic }
+                        NumberAnimation { target: popupItem; property: "opacity"; duration: 240; to: 1; easing.type: Easing.OutCubic }
                     }
                 }
 
-                // Kapanma animasyonu
+                // Kapanma animasyonu (scale + fade)
                 SequentialAnimation {
                     id: popupCloseAnim
                     running: false
                     ParallelAnimation {
-                        NumberAnimation {
-                            target: popupItem; property: "scale"; duration: 450
-                            to: 0.85; easing.type: Easing.OutBack; easing.overshoot: 2.8
-                        }
-                        NumberAnimation { target: popupItem; property: "opacity"; duration: 350; to: 0; easing.type: Easing.OutCubic }
+                        NumberAnimation { target: popupItem; property: "scale"; duration: 180; to: 0.88; easing.type: Easing.OutCubic }
+                        NumberAnimation { target: popupItem; property: "opacity"; duration: 150; to: 0; easing.type: Easing.OutCubic }
                     }
                 }
 
-                // Popup içerikleri — hangisi aktifse o görünür
-                CalendarPopup    { anchors.fill: parent; visible: AppState.activePopup === "calendar";     theme: theme; open: true }
-                NotificationPopup { anchors.fill: parent; visible: AppState.activePopup === "notifications"; theme: theme; open: true; dnd: AppState.dndEnabled; notificationModel: notifModel; onDismissNotif: function(id) { root._dismissNotif(id) }; onClearAll: root._clearAllNotifs(); onToggleDnd: AppState.dndEnabled = !AppState.dndEnabled }
-                WifiPopup        { anchors.fill: parent; visible: AppState.activePopup === "wifi";           theme: theme; open: true }
-                BluetoothPopup   { anchors.fill: parent; visible: AppState.activePopup === "bluetooth";      theme: theme; open: true }
-                VolumePopup      { anchors.fill: parent; visible: AppState.activePopup === "volume";         theme: theme; open: true }
-                BrightnessPopup  { anchors.fill: parent; visible: AppState.activePopup === "brightness";     theme: theme; open: true }
-                PowerPopup       { anchors.fill: parent; visible: AppState.activePopup === "battery";        theme: theme; open: true; mode: PowerService.mode; batteryPct: UPower.displayDevice?.ready ? Math.round((UPower.displayDevice.percentage || 0) * 100) : 0; charging: UPower.displayDevice?.state === 1 || UPower.displayDevice?.state === 4; onModeSelected: function(m) { PowerService.setMode(m) } }
-                PowerMenuPopup   { anchors.fill: parent; visible: AppState.activePopup === "power";          theme: theme; open: true }
-                MediaPopup       { anchors.fill: parent; visible: AppState.activePopup === "media";          theme: theme; open: true }
+                // Popup içerikleri — Loader ile sync yüklenir, animasyon başlamadan hazır olur
+                Loader {
+                    anchors.fill: parent
+                    active: AppState.activePopup === "calendar"
+                    sourceComponent: CalendarPopup {
+                        visible: AppState.activePopup === "calendar"
+                        theme: liveTheme
+                        open: true
+                    }
+                }
+                Loader {
+                    anchors.fill: parent
+                    active: AppState.activePopup === "notifications"
+                    sourceComponent: NotificationPopup {
+                        visible: AppState.activePopup === "notifications"
+                        theme: liveTheme
+                        open: true
+                        dnd: AppState.dndEnabled
+                        notificationModel: notifModel
+                        onDismissNotif: function(id) { root._dismissNotif(id) }
+                        onClearAll: root._clearAllNotifs()
+                        onToggleDnd: AppState.dndEnabled = !AppState.dndEnabled
+                    }
+                }
+                Loader {
+                    anchors.fill: parent
+                    active: AppState.activePopup === "wifi"
+                    sourceComponent: WifiPopup {
+                        visible: AppState.activePopup === "wifi"
+                        theme: liveTheme
+                        open: true
+                    }
+                }
+                Loader {
+                    anchors.fill: parent
+                    active: AppState.activePopup === "bluetooth"
+                    sourceComponent: BluetoothPopup {
+                        visible: AppState.activePopup === "bluetooth"
+                        theme: liveTheme
+                        open: true
+                    }
+                }
+                Loader {
+                    anchors.fill: parent
+                    active: AppState.activePopup === "volume"
+                    sourceComponent: VolumePopup {
+                        visible: AppState.activePopup === "volume"
+                        theme: liveTheme
+                        open: true
+                    }
+                }
+                Loader {
+                    anchors.fill: parent
+                    active: AppState.activePopup === "brightness"
+                    sourceComponent: BrightnessPopup {
+                        visible: AppState.activePopup === "brightness"
+                        theme: liveTheme
+                        open: true
+                    }
+                }
+                Loader {
+                    anchors.fill: parent
+                    active: AppState.activePopup === "battery"
+                    sourceComponent: PowerPopup {
+                        visible: AppState.activePopup === "battery"
+                        theme: liveTheme
+                        open: true
+                        mode: PowerService.mode
+                        batteryPct: UPower.displayDevice?.ready ? Math.round((UPower.displayDevice.percentage || 0) * 100) : 0
+                        charging: UPower.displayDevice?.state === 1 || UPower.displayDevice?.state === 4
+                        onModeSelected: function(m) { PowerService.setMode(m) }
+                    }
+                }
+                Loader {
+                    anchors.fill: parent
+                    active: AppState.activePopup === "power"
+                    sourceComponent: PowerMenuPopup {
+                        visible: AppState.activePopup === "power"
+                        theme: liveTheme
+                        open: true
+                    }
+                }
+                Loader {
+                    anchors.fill: parent
+                    active: AppState.activePopup === "media"
+                    sourceComponent: MediaPopup {
+                        visible: AppState.activePopup === "media"
+                        theme: liveTheme
+                        open: true
+                    }
+                }
+                Loader {
+                    anchors.fill: parent
+                    active: AppState.activePopup === "launcher"
+                    sourceComponent: AppLauncherPopup {
+                        visible: AppState.activePopup === "launcher"
+                        theme: liveTheme
+                        open: true
+                    }
+                }
+                Loader {
+                    id: wallpaperLoader
+                    anchors.fill: parent
+                    active: root._preloadedWallpaper || AppState.activePopup === "wallpaper"
+                    asynchronous: true
+                    sourceComponent: WallpaperPopup {
+                        visible: AppState.activePopup === "wallpaper"
+                        palette: liveTheme
+                    }
+                    onLoaded: wallpaperLoader.active = true
+                }
 
                 // ESC tuşu ile popup kapat
                 Keys.onPressed: (event) => {
@@ -355,6 +613,14 @@ ShellRoot {
                     }
                 }
                 Keys.priority: Keys.BeforeItem
+            }
+
+            // Kısayol: Alt+Space ile uygulama başlatıcı
+            Shortcut {
+                sequence: "Alt+Space"
+                onActivated: {
+                    root.openPopup("launcher")
+                }
             }
         }
     }
@@ -387,7 +653,7 @@ ShellRoot {
                     delegate: NotificationToast {
                         y: index * 68
                         notifId: model.toastId
-                        theme: theme
+                        theme: liveTheme
                         summary: model.summary
                         body: model.body
                         urgency: model.urgency
@@ -422,14 +688,14 @@ ShellRoot {
                 scale: AppState.osdType !== "" ? 1 : 0.8
 
                 Behavior on opacity { NumberAnimation { duration: 450; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 450; easing.type: Easing.OutBack; easing.overshoot: 1.3 } }
+                Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
 
                 // OSD arkaplan
                 Rectangle {
                     id: osdBg
                     anchors.fill: parent
                     radius: 12
-                    color: theme ? theme.bgPopupBlur : "#202020"
+                    color: liveTheme ? liveTheme.bgPopupBlur : "#202020"
                 }
 
                 // OSD içerik: ikon + yüzde
@@ -459,7 +725,7 @@ ShellRoot {
                             return ""
                         }
                         iconSize: 22
-                        iconColor: theme.text
+                        iconColor: liveTheme.text
                     }
 
                     Text {
@@ -471,10 +737,10 @@ ShellRoot {
                             }
                             return ""
                         }
-                        color: theme.text
+                        color: liveTheme.text
                         font.pixelSize: 18
                         font.bold: true
-                        font.family: theme.fontFamily
+                        font.family: liveTheme.fontFamily
                     }
                 }
 

@@ -8,7 +8,7 @@ import qs.components
 
 Item {
     id: root
-    property var theme: null
+    property Item theme: null
 
     signal powerClicked()
 
@@ -19,10 +19,11 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgDark : "#202020"
+        color: theme ? theme.bgBar : "#7f0c1a33"
         radius: 14
-        border.color: theme ? theme.border : "#323232"
+        border.color: theme ? theme.border : "#66343434"
         border.width: 1
+        Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
         Item {
             id: powerInner
@@ -34,13 +35,14 @@ Item {
                 anchors.centerIn: parent
                 source: root._icon + "system-shutdown-symbolic.svg"
                 iconSize: 14
-                iconColor: theme ? theme.text : "#c5c5c5"
+                iconColor: theme ? theme.active : "#a6badd"
             }
 
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
-                onPressed: root.powerClicked()
+                hoverEnabled: true
+                onClicked: root.powerClicked()
             }
         }
     }

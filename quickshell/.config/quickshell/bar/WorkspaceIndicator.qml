@@ -9,15 +9,16 @@ import QtQuick
 
 Rectangle {
     id: root
-    property var theme: null
+    property Item theme: null
 
     height: 32
     width: wsRow.width + 24
-    Behavior on width { NumberAnimation { duration: 450; easing.type: Easing.OutBack; easing.overshoot: 2.8 } }
-    color: theme ? theme.bgDark : "#202020"
+    Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+    color: theme ? theme.bgBar : "#7f0c1a33"
     radius: 14
-    border.color: theme ? theme.border : "#323232"
+    border.color: theme ? theme.border : "#66343434"
     border.width: 1
+    Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
     Row {
         id: wsRow
@@ -37,13 +38,10 @@ Rectangle {
                 width: isActive ? 28 : 10   // aktif olan daha geniş
                 height: 10
                 radius: 5
-                color: isActive
-                    ? (theme ? theme.active : "#b0b0b0")
-                    : (isOccupied
-                        ? (theme ? theme.hover : "#606060")
-                        : (theme ? theme.empty : "#414141"))
+                color: isActive ? "#a6badd" : (isOccupied ? "#5376b6" : "#334c79")
 
-                Behavior on width { NumberAnimation { duration: 450; easing.type: Easing.OutBack; easing.overshoot: 2.8 } }
+                
+                Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
                 Behavior on color { ColorAnimation { duration: 200 } }
 
                 // Tıklayınca o workspace'e git

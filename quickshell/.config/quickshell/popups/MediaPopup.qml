@@ -13,7 +13,7 @@ import qs.components
 
 Item {
     id: root
-    property var theme: null
+    property Item theme: null
     property bool open: false
 
     readonly property string _icons: Quickshell.shellDir + "/bar/icons/"
@@ -65,9 +65,12 @@ Item {
         }
     }
 
-    Component.onCompleted: findBestPlayer()
+    Component.onCompleted: {
+        findBestPlayer()
+        if (player) _trackPosition = player.position
+    }
 
-    // Kombine timer: oynatıcı bul + pozisyon senkronizasyonu
+    // Kombine timer: oynatıcı bul + pozisyon takibi (direkt D-Bus)
     Timer {
         interval: 250
         running: true
@@ -76,20 +79,10 @@ Item {
         onTriggered: {
             findBestPlayer()
             if (player && !_dragging) {
-                var dbusPos = player.position
-                if (dbusPos >= 0) {
-                    if (player.isPlaying) {
-                        if (Math.abs(dbusPos - _trackPosition) > 1.5) {
-                            _trackPosition = dbusPos
-                        }
-                        _trackPosition += 0.25
-                    } else {
-                        _trackPosition = dbusPos
-                    }
-                    if (len > 0 && _trackPosition >= len) {
-                        _trackPosition = len
-                    }
-                }
+                var p = player.position
+                if (p >= 0) _trackPosition = p
+                if (_trackPosition < 0) _trackPosition = 0
+                if (len > 0 && _trackPosition > len) _trackPosition = len
             }
         }
     }
@@ -103,8 +96,12 @@ Item {
 
     function formatTime(s) {
         if (s <= 0) return "0:00"
-        var m = Math.floor(s / 60)
-        var sec = Math.floor(s % 60)
+        var totalSec = Math.floor(s)
+        var h = Math.floor(totalSec / 3600)
+        var m = Math.floor((totalSec % 3600) / 60)
+        var sec = totalSec % 60
+        if (h > 0)
+            return h + ":" + (m < 10 ? "0" : "") + m + ":" + (sec < 10 ? "0" : "") + sec
         return m + ":" + (sec < 10 ? "0" : "") + sec
     }
 
@@ -113,9 +110,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#202020"
+        color: theme ? theme.bgPopupBlur : "#8c0c1a33"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#323232"; border.width: 1
+        border.color: theme ? theme.border : "#66374d75"; border.width: 1
     }
 
     ColumnLayout {
@@ -132,15 +129,15 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 10
-                    color: theme ? theme.empty : "#414141"
+                    color: theme ? theme.empty : "#334c79"
 
                     ColorizedIcon {
                         anchors.centerIn: parent
                         source: root._icons + "music-note-symbolic.svg"
                         iconSize: 28
                         iconColor: root.isPlaying
-                            ? (theme ? theme.active : "#b0b0b0")
-                            : (theme ? theme.text : "#c5c5c5")
+                            ? (theme ? theme.active : "#a6badd")
+                            : (theme ? theme.text : "#c2c3c6")
                     }
                 }
             }
@@ -153,7 +150,7 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     text: root.trackTitle
-                    color: theme ? theme.textBright : "#ffffff"
+                    color: theme ? theme.textBright : "#f7f7f7"
                     font.pixelSize: 14
                     font.bold: true
                     font.family: theme ? theme.fontFamily : "monospace"
@@ -163,7 +160,7 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     text: root.trackArtist || "\u2014"
-                    color: theme ? theme.text : "#c5c5c5"
+                    color: theme ? theme.text : "#c2c3c6"
                     font.pixelSize: 11
                     font.family: theme ? theme.fontFamily : "monospace"
                     elide: Text.ElideRight
@@ -184,7 +181,7 @@ Item {
                 anchors.verticalCenterOffset: 2
                 height: 8
                 radius: height / 2
-                color: theme ? theme.border : "#323232"
+                color: theme ? theme.border : "#66374d75"
 
                 transform: Scale { origin.y: 4; yScale: root._progressScaleY }
 
@@ -194,7 +191,7 @@ Item {
                     anchors.bottom: parent.bottom
                     width: parent.width * root.displayProgress
                     radius: parent.radius
-                    color: theme ? theme.active : "#b0b0b0"
+                    color: theme ? theme.active : "#a6badd"
 
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -215,7 +212,7 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: -10
                 text: root.formatTime(root.displayPos)
-                color: theme ? theme.text : "#c5c5c5"
+                color: theme ? theme.text : "#c2c3c6"
                 font.pixelSize: 11
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -225,7 +222,7 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: -10
                 text: root.formatTime(root.len)
-                color: theme ? theme.text : "#c5c5c5"
+                color: theme ? theme.text : "#c2c3c6"
                 font.pixelSize: 11
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -279,15 +276,15 @@ Item {
                 width: 28; height: 28
                 property real _s: prevMa.containsMouse ? 1.15 : 1.0
                 scale: _s
-                Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutBack } }
+                Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
 
                 ColorizedIcon {
                     anchors.centerIn: parent
                     source: root._icons + "media-skip-backward-symbolic.svg"
                     iconSize: 22
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.text : "#c5c5c5")
-                        : (theme ? theme.empty : "#414141")
+                        ? (theme ? theme.active : "#a6badd")
+                        : (theme ? theme.empty : "#334c79")
                 }
 
                 MouseArea {
@@ -305,7 +302,7 @@ Item {
                 width: 36; height: 36
                 property real _s: playMa.containsMouse ? 1.12 : 1.0
                 scale: _s
-                Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutBack } }
+                Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
 
                 ColorizedIcon {
                     anchors.centerIn: parent
@@ -314,8 +311,8 @@ Item {
                         : root._icons + "media-playback-start-symbolic.svg"
                     iconSize: 30
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.textBright : "#ffffff")
-                        : (theme ? theme.empty : "#414141")
+                        ? (theme ? theme.active : "#a6badd")
+                        : (theme ? theme.empty : "#334c79")
                 }
 
                 MouseArea {
@@ -333,15 +330,15 @@ Item {
                 width: 28; height: 28
                 property real _s: nextMa.containsMouse ? 1.15 : 1.0
                 scale: _s
-                Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutBack } }
+                Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
 
                 ColorizedIcon {
                     anchors.centerIn: parent
                     source: root._icons + "media-skip-forward-symbolic.svg"
                     iconSize: 22
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.text : "#c5c5c5")
-                        : (theme ? theme.empty : "#414141")
+                        ? (theme ? theme.active : "#a6badd")
+                        : (theme ? theme.empty : "#334c79")
                 }
 
                 MouseArea {
@@ -366,8 +363,8 @@ Item {
                     : root._icons + "audio-volume-high-symbolic.svg"
                 iconSize: 14
                 iconColor: (Pipewire.defaultAudioSink?.audio?.muted ?? false)
-                    ? (theme ? theme.warn : "#f38ba8")
-                    : (theme ? theme.text : "#c5c5c5")
+                    ? (theme ? theme.warn : "#d09caa")
+                    : (theme ? theme.text : "#c2c3c6")
             }
 
             // Ses slider'ı
@@ -397,7 +394,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     height: 8
                     radius: height / 2
-                    color: theme ? theme.border : "#323232"
+                    color: theme ? theme.border : "#66374d75"
 
                     transform: Scale { origin.y: 4; yScale: volSlider._scaleY }
 
@@ -407,7 +404,7 @@ Item {
                         anchors.bottom: parent.bottom
                         width: parent.width * volSlider._pos
                         radius: parent.radius
-                        color: theme ? theme.active : "#b0b0b0"
+                        color: theme ? theme.active : "#a6badd"
 
                         Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter

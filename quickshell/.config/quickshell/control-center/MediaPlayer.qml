@@ -10,6 +10,7 @@ import qs.components
 
 Item {
     id: mediaRoot
+    property Item theme: null
     implicitHeight: 88
 
     readonly property string _icons: Quickshell.shellDir + "/bar/icons/"
@@ -78,7 +79,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             radius: height / 2
-            color: "#2a2c42"
+            color: mediaRoot.theme ? mediaRoot.theme.border : "#2a2c42"
 
             // İlerleme (dolu kısım)
             Rectangle {
@@ -92,7 +93,7 @@ Item {
 
                 width: parent.width * fillPercent
                 height: parent.height
-                color: "#e8e9f5"
+                color: mediaRoot.theme ? mediaRoot.theme.active : "#e8e9f5"
                 radius: parent.radius
             }
         }
@@ -116,9 +117,9 @@ Item {
     // Kart arkaplanı
     Rectangle {
         anchors.fill: parent
-        color:        "#1c1d2b"
+        color:        theme ? theme.bgPopup : "#1c1d2b"
         radius:       14
-        border.color: "#2a2c42"
+        border.color: theme ? theme.border : "#2a2c42"
         border.width: 1
 
         RowLayout {
@@ -128,12 +129,12 @@ Item {
             // Müzik ikonu
             Rectangle {
                 width: 48; height: 48; radius: 10
-                color: "#2a2c42"
+                color: theme ? theme.empty : "#2a2c42"
                 ColorizedIcon {
                     anchors.centerIn: parent
                     source: mediaRoot._icons + "audio-volume-medium-symbolic.svg"
                     iconSize: 22
-                    iconColor: "#7e8099"
+                    iconColor: theme ? theme.active : "#7e8099"
                 }
             }
 
@@ -145,14 +146,14 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     text:  mediaRoot.trackTitle
-                    color: "#e8e9f5"
+                    color: theme ? theme.textBright : "#e8e9f5"
                     font { pixelSize: 14; weight: Font.SemiBold }
                     elide: Text.ElideRight
                 }
                 Text {
                     Layout.fillWidth: true
                     text:  mediaRoot.trackArtist
-                    color: "#7e8099"
+                    color: theme ? theme.textMuted : "#7e8099"
                     font.pixelSize: 11
                     elide: Text.ElideRight
                 }
@@ -164,7 +165,7 @@ Item {
 
                     Text {
                         text: mediaRoot.formatTime(mediaRoot.position)
-                        color: "#7e8099"
+                        color: theme ? theme.textMuted : "#7e8099"
                         font.pixelSize: 10
                     }
 
@@ -180,7 +181,7 @@ Item {
 
                     Text {
                         text: mediaRoot.formatTime(mediaRoot.length)
-                        color: "#7e8099"
+                        color: theme ? theme.textMuted : "#7e8099"
                         font.pixelSize: 10
                     }
                 }
@@ -199,6 +200,7 @@ Item {
                     MediaButton {
                         iconSource: mediaRoot._icons + "media-skip-backward-symbolic.svg"
                         enabled: mediaRoot.player !== null
+                        theme: mediaRoot.theme
                         onClicked: if (mediaRoot.player) mediaRoot.player.previous()
                     }
                     MediaButton {
@@ -207,11 +209,13 @@ Item {
                             : mediaRoot._icons + "media-playback-start-symbolic.svg"
                         primary: true
                         enabled: mediaRoot.player !== null
+                        theme: mediaRoot.theme
                         onClicked: if (mediaRoot.player) mediaRoot.player.togglePlaying()
                     }
                     MediaButton {
                         iconSource: mediaRoot._icons + "media-skip-forward-symbolic.svg"
                         enabled: mediaRoot.player !== null
+                        theme: mediaRoot.theme
                         onClicked: if (mediaRoot.player) mediaRoot.player.next()
                     }
                 }
@@ -224,7 +228,7 @@ Item {
                     ColorizedIcon {
                         source: mediaRoot._icons + "audio-volume-low-symbolic.svg"
                         iconSize: 12
-                        iconColor: "#7e8099"
+                        iconColor: theme ? theme.textMuted : "#7e8099"
                     }
 
                     AppleSlider {

@@ -9,7 +9,7 @@ import qs.components
 
 Rectangle {
     id: root
-    property var theme: null
+    property Item theme: null
 
     readonly property string _icon: Quickshell.shellDir + "/bar/icons/"
 
@@ -17,10 +17,11 @@ Rectangle {
     implicitWidth: row.implicitWidth + 16
     visible: SystemService.ramUsed > 0
 
-    color: theme ? theme.bgDark : "#202020"
+    color: theme ? theme.bgBar : "#7f0c1a33"
     radius: 14
-    border.color: theme ? theme.border : "#323232"
+    border.color: theme ? theme.border : "#66343434"
     border.width: 1
+    Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
     Row {
         id: row
@@ -33,12 +34,12 @@ Rectangle {
             ColorizedIcon {
                 source: root._icon + "computer-symbolic.svg"
                 iconSize: 18
-                iconColor: SystemService.cpuLoad > 80 ? (theme ? theme.warn : "#f38ba8") : (theme ? theme.text : "#c5c5c5")
+                iconColor: SystemService.cpuLoad > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#a6badd")
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
                 text: Math.round(SystemService.cpuLoad) + "%"
-                color: SystemService.cpuLoad > 80 ? (theme ? theme.warn : "#f38ba8") : (theme ? theme.text : "#c5c5c5")
+                color: SystemService.cpuLoad > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c2c3c6")
                 font.pixelSize: 14; font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -50,12 +51,12 @@ Rectangle {
             ColorizedIcon {
                 source: root._icon + "drive-harddisk-symbolic.svg"
                 iconSize: 18
-                iconColor: SystemService.ramUsed > 0.8 ? (theme ? theme.warn : "#f38ba8") : (theme ? theme.text : "#c5c5c5")
+                iconColor: SystemService.ramUsed > 0.8 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#a6badd")
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
                 text: Math.round(SystemService.ramUsed * 100) + "%"
-                color: SystemService.ramUsed > 0.8 ? (theme ? theme.warn : "#f38ba8") : (theme ? theme.text : "#c5c5c5")
+                color: SystemService.ramUsed > 0.8 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c2c3c6")
                 font.pixelSize: 14; font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -68,12 +69,12 @@ Rectangle {
             ColorizedIcon {
                 source: root._icon + "temperature-normal-symbolic.svg"
                 iconSize: 18
-                iconColor: SystemService.temp > 80 ? (theme ? theme.warn : "#f38ba8") : (theme ? theme.text : "#c5c5c5")
+                iconColor: SystemService.temp > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#a6badd")
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
                 text: SystemService.temp + "\u00B0"
-                color: SystemService.temp > 80 ? (theme ? theme.warn : "#f38ba8") : (theme ? theme.text : "#c5c5c5")
+                color: SystemService.temp > 80 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c2c3c6")
                 font.pixelSize: 14; font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
             }

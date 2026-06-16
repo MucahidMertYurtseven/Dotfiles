@@ -11,7 +11,7 @@ import qs.services
 
 Rectangle {
     id: root
-    property var theme: null
+    property Item theme: null
     signal clicked()
 
     property bool _showMedia: false       // saat mi medya mı görünsün
@@ -42,16 +42,17 @@ Rectangle {
     height: 32
     clip: true
 
-    color: theme ? theme.bgDark : "#202020"
+    color: theme ? theme.bgBar : "#7f0c1a33"
     radius: 14
-    border.color: theme ? theme.border : "#323232"
+    border.color: theme ? theme.border : "#66343434"
     border.width: 1
+    Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
     property int _clockWidth: text.implicitWidth + 32
     property int _targetWidth: _showMedia && _trackTitle ? 320 : _clockWidth
     width: _targetWidth
     Behavior on width {
-        NumberAnimation { duration: 450; easing.type: Easing.OutBack; easing.overshoot: 2.8 }
+        NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
     }
 
     // Sayıları iki basamaklı yap (ör: 09)
@@ -137,7 +138,7 @@ Rectangle {
                     width: parent.width / 64 - 1
                     height: _barHeights.length === 64 ? _barHeights[index] : 0
                     radius: width / 2
-                    color: theme ? theme.text : "#c5c5c5"
+                    color: theme ? theme.text : "#c2c3c6"
                     anchors.verticalCenter: parent.verticalCenter
                     Behavior on height {
                         NumberAnimation { duration: 30; easing.type: Easing.OutSine }
@@ -161,7 +162,7 @@ Rectangle {
                 x: root._marqueeX
                 anchors.verticalCenter: parent.verticalCenter
                 text: root._dispText
-                color: theme ? theme.text : "#c5c5c5"
+                color: theme ? theme.text : "#c2c3c6"
                 font.pixelSize: 12; font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -171,7 +172,7 @@ Rectangle {
                 x: marqueeText.x + marqueeText.width + 80
                 anchors.verticalCenter: parent.verticalCenter
                 text: root._dispText
-                color: theme ? theme.text : "#c5c5c5"
+                color: theme ? theme.text : "#c2c3c6"
                 font.pixelSize: 12; font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
                 visible: marqueeText.width > 0
@@ -258,12 +259,10 @@ Rectangle {
 
     // -- Tıklama ve scroll ile görünüm değiştir --
     MouseArea {
-        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-        onPressed: root.clicked()
+        anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+        onClicked: root.clicked()
         onWheel: (wheel) => {
-            if (_trackTitle) {
-                _showMedia = !_showMedia
-            }
+            _showMedia = !_showMedia
         }
     }
 }

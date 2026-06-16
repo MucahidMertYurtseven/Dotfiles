@@ -11,7 +11,7 @@ import qs.components
 
 Item {
     id: root
-    property var theme: null
+    property Item theme: null
 
     signal batteryClicked()
     signal brightnessClicked()
@@ -45,10 +45,11 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgDark : "#202020"
+        color: theme ? theme.bgBar : "#7f0c1a33"
         radius: 14
-        border.color: theme ? theme.border : "#323232"
+        border.color: theme ? theme.border : "#66343434"
         border.width: 1
+        Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
         Row {
             id: innerRow
@@ -75,13 +76,13 @@ Item {
                             return root._icon + "battery-android-frame-2.svg"
                         }
                         iconSize: 20
-                        iconColor: root._batPct <= 10 ? (theme ? theme.warn : "#f38ba8") : (theme ? theme.text : "#c5c5c5")
+                        iconColor: root._batPct <= 10 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#a6badd")
                     }
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: root._batPct + "%"
-                        color: theme ? theme.text : "#c5c5c5"
+                        color: theme ? theme.text : "#c2c3c6"
                         font.pixelSize: 14
                         font.family: theme ? theme.fontFamily : "monospace"
                         font.bold: true
@@ -89,14 +90,14 @@ Item {
                 }
 
                 MouseArea {
-                    anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                    onPressed: root.batteryClicked()
+                    anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                    onClicked: root.batteryClicked()
                 }
             }
 
             // Ayraç
             Item { width: 8; height: 32
-                Rectangle { anchors.centerIn: parent; width: 1; height: 18; color: theme ? theme.border : "#323232"; opacity: 0.5 }
+                Rectangle { anchors.centerIn: parent; width: 1; height: 18; color: theme ? theme.border : "#66374d75"; opacity: 0.5 }
             }
 
             // Parlaklık
@@ -112,11 +113,11 @@ Item {
                             : "brightness-empty-symbolic.svg")
                     }
                     iconSize: 18
-                    iconColor: theme ? theme.text : "#c5c5c5"
+                    iconColor: theme ? theme.active : "#a6badd"
                 }
                 MouseArea {
-                    anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                    onPressed: root.brightnessClicked()
+                    anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                    onClicked: root.brightnessClicked()
                     onWheel: (wheel) => {
                         var step = 0.05
                         var v = Math.max(0.05, Math.min(1, BrightnessService.value + (wheel.angleDelta.y > 0 ? step : -step)))
@@ -128,7 +129,7 @@ Item {
 
             // Ayraç
             Item { width: 8; height: 32
-                Rectangle { anchors.centerIn: parent; width: 1; height: 18; color: theme ? theme.border : "#323232"; opacity: 0.5 }
+                Rectangle { anchors.centerIn: parent; width: 1; height: 18; color: theme ? theme.border : "#66374d75"; opacity: 0.5 }
             }
 
             // Ses
@@ -141,11 +142,11 @@ Item {
                             : (AudioService.volume >= 0.50 ? root._icon + "audio-volume-high-symbolic.svg"
                                 : root._icon + "audio-volume-medium-symbolic.svg"))
                     iconSize: 20
-                    iconColor: AudioService.muted ? (theme ? theme.warn : "#f38ba8") : (theme ? theme.text : "#c5c5c5")
+                    iconColor: AudioService.muted ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#a6badd")
                 }
                 MouseArea {
-                    anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                    onPressed: root.volumeClicked()
+                    anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                    onClicked: root.volumeClicked()
                     onWheel: (wheel) => {
                         var step = 0.05
                         var v = Math.max(0, Math.min(1, AudioService.volume + (wheel.angleDelta.y > 0 ? step : -step)))

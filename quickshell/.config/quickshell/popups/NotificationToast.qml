@@ -10,7 +10,7 @@ import qs.components
 
 Item {
     id: root
-    property var theme: null
+    property Item theme: null
     property int notifId: -1
     property string summary: ""
     property string body: ""
@@ -30,7 +30,7 @@ Item {
         PropertyAction { target: root; property: "scale"; value: 0.8 }
         PropertyAction { target: root; property: "opacity"; value: 0 }
         ParallelAnimation {
-            NumberAnimation { target: root; property: "scale"; duration: 450; to: 1; easing.type: Easing.OutBack; easing.overshoot: 1.3 }
+            NumberAnimation { target: root; property: "scale"; duration: 350; to: 1; easing.type: Easing.OutCubic }
             NumberAnimation { target: root; property: "opacity"; duration: 450; to: 1; easing.type: Easing.OutCubic }
         }
         ScriptAction { script: dismissTimer.restart() }
@@ -65,6 +65,7 @@ Item {
 
     // Bildirime tıklayınca bildirim popup'ını aç
     MouseArea {
+        id: toastMa
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
@@ -77,22 +78,22 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: 12
-        color: theme ? theme.bgPopupBlur : "#202020"
-        border.color: theme ? theme.border : "#323232"; border.width: 1
+        color: theme ? theme.bgPopupBlur : "#8c0c1a33"
+        border.color: theme ? theme.border : "#66374d75"; border.width: 1
     }
 
     // İçerik
     RowLayout {
         id: col
         anchors { fill: parent; margins: 8 }
-        spacing: 6
+        spacing: 8
 
         // Önem derecesi çizgisi
         Rectangle {
             width: 3; height: parent.height; radius: 1.5
-            color: urgency === 2 ? (theme ? theme.warn : "#f38ba8")
-                 : urgency === 1 ? (theme ? theme.text : "#c5c5c5")
-                 : (theme ? theme.textMuted : "#7e8099")
+            color: urgency === 2 ? (theme ? theme.warn : "#d09caa")
+                 : urgency === 1 ? (theme ? theme.text : "#c2c3c6")
+                 : (theme ? theme.textMuted : "#7f95bc")
         }
 
         // Başlık + mesaj
@@ -103,7 +104,7 @@ Item {
 
             Text {
                 text: root.summary
-                color: theme ? theme.textBright : "#ffffff"
+                color: theme ? theme.textBright : "#f7f7f7"
                 font.pixelSize: 11
                 font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
@@ -113,7 +114,7 @@ Item {
 
             Text {
                 text: root.body
-                color: theme ? theme.text : "#c5c5c5"
+                color: theme ? theme.text : "#c2c3c6"
                 font.pixelSize: 10
                 font.family: theme ? theme.fontFamily : "monospace"
                 elide: Text.ElideRight
@@ -123,15 +124,15 @@ Item {
             }
         }
 
-        // Kapatma butonu
-        Rectangle {
-            width: 18; height: 18; radius: 4
-            color: theme ? theme.hover : "#606060"
+        // Kapatma butonu (cercevesiz, hep görünür)
+        Item {
+            width: 16; height: 22
+            Layout.alignment: Qt.AlignVCenter
 
             Rectangle {
                 width: 10; height: 2; radius: 1
                 anchors.centerIn: parent
-                color: theme ? theme.text : "#c5c5c5"
+                color: theme ? theme.text : "#c2c3c6"
             }
 
             MouseArea {
@@ -143,5 +144,6 @@ Item {
                 }
             }
         }
+
     }
 }

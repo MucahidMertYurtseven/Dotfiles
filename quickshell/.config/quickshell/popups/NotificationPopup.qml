@@ -11,7 +11,7 @@ import qs.components
 
 Item {
     id: root
-    property var theme: null
+    property Item theme: null
     property bool open: false
     property bool dnd: false
     property var notificationModel: null     // shell.qml'deki ListModel
@@ -24,9 +24,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#202020"
+        color: theme ? theme.bgPopupBlur : "#8c0c1a33"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#323232"; border.width: 1
+        border.color: theme ? theme.border : "#66374d75"; border.width: 1
     }
 
     ColumnLayout {
@@ -46,14 +46,14 @@ Item {
                         : root._icon + "notifications-symbolic.svg"
                 iconSize: 18
                 iconColor: dnd
-                    ? (theme ? theme.warn : "#f38ba8")
-                    : (theme ? theme.text : "#c5c5c5")
+                    ? (theme ? theme.warn : "#d09caa")
+                    : (theme ? theme.text : "#c2c3c6")
             }
 
             // Başlık
             Text {
                 text: dnd ? "Rahatsız Etmeyin Açık" : "Bildirimler"
-                color: theme ? theme.text : "#c5c5c5"
+                color: theme ? theme.text : "#c2c3c6"
                 font.pixelSize: 13
                 font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
@@ -63,11 +63,11 @@ Item {
             // DND toggle düğmesi
             Rectangle {
                 width: 44; height: 24; radius: 12
-                color: dnd ? (theme ? theme.warn : "#f38ba8") : (theme ? theme.empty : "#414141")
+                color: dnd ? (theme ? theme.warn : "#d09caa") : (theme ? theme.empty : "#334c79")
                 Rectangle {
                     x: dnd ? parent.width - width - 2 : 2; y: 2
                     width: 20; height: 20; radius: 10
-                    color: dnd ? "#ffffff" : (theme ? theme.text : "#c5c5c5")
+                    color: dnd ? "#ffffff" : (theme ? theme.text : "#c2c3c6")
                     Behavior on x { NumberAnimation { duration: 150 } }
                 }
                 MouseArea {
@@ -81,7 +81,7 @@ Item {
         // Ayraç çizgisi
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#323232"
+            color: theme ? theme.border : "#66374d75"
             opacity: 0.6
         }
 
@@ -107,7 +107,7 @@ Item {
                         implicitHeight: 54
                         radius: 6
                         color: ma.containsMouse
-                            ? (theme ? theme.hover : "#606060")
+                            ? (theme ? theme.hover : "#5376b6")
                             : "transparent"
 
                         RowLayout {
@@ -120,9 +120,9 @@ Item {
                             Rectangle {
                                 width: 3; height: 40; radius: 1.5
                                 Layout.alignment: Qt.AlignVCenter
-                                color: urgency === 2 ? (theme ? theme.warn : "#f38ba8")
-                                     : urgency === 1 ? (theme ? theme.text : "#c5c5c5")
-                                     : (theme ? theme.textMuted : "#7e8099")
+                                color: urgency === 2 ? (theme ? theme.warn : "#d09caa")
+                                     : urgency === 1 ? (theme ? theme.text : "#c2c3c6")
+                                     : (theme ? theme.textMuted : "#7f95bc")
                             }
 
                             // Bildirim içeriği: başlık + mesaj
@@ -133,7 +133,7 @@ Item {
 
                                 Text {
                                     text: summary || ""
-                                    color: theme ? theme.textBright : "#ffffff"
+                                    color: theme ? theme.textBright : "#f7f7f7"
                                     font.pixelSize: 11
                                     font.bold: true
                                     font.family: theme ? theme.fontFamily : "monospace"
@@ -143,7 +143,7 @@ Item {
 
                                 Text {
                                     text: body || ""
-                                    color: theme ? theme.text : "#c5c5c5"
+                                    color: theme ? theme.text : "#c2c3c6"
                                     font.pixelSize: 10
                                     font.family: theme ? theme.fontFamily : "monospace"
                                     elide: Text.ElideRight
@@ -156,14 +156,14 @@ Item {
                             // Silme butonu (hover'da görünür)
                             Rectangle {
                                 width: 22; height: 22; radius: 5
-                                color: theme ? theme.hover : "#606060"
+                                color: theme ? theme.hover : "#5376b6"
                                 visible: ma.containsMouse
                                 Layout.alignment: Qt.AlignVCenter
 
                                 Rectangle {
                                     width: 12; height: 2; radius: 1
                                     anchors.centerIn: parent
-                                    color: theme ? theme.text : "#c5c5c5"
+                                    color: theme ? theme.text : "#c2c3c6"
                                 }
 
                                 MouseArea {
@@ -197,7 +197,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     visible: notificationModel ? notificationModel.count === 0 : true
                     text: dnd ? "Bildirimler susturuldu" : "Bildirim yok"
-                    color: theme ? theme.textMuted : "#7e8099"
+                    color: theme ? theme.textMuted : "#7f95bc"
                     font.pixelSize: 11
                     font.family: theme ? theme.fontFamily : "monospace"
                     topPadding: 8
@@ -211,7 +211,7 @@ Item {
             Layout.preferredHeight: 28
             visible: notificationModel ? notificationModel.count > 0 : false
             color: clearAllFooter.containsMouse
-                ? (theme ? theme.hover : "#606060")
+                ? (theme ? theme.hover : "#5376b6")
                 : "transparent"
             radius: 6
 
@@ -219,8 +219,8 @@ Item {
                 anchors.centerIn: parent
                 text: "Tümünü Temizle"
                 color: clearAllFooter.containsMouse
-                    ? (theme ? theme.textBright : "#ffffff")
-                    : (theme ? theme.textMuted : "#7e8099")
+                    ? (theme ? theme.textBright : "#f7f7f7")
+                    : (theme ? theme.textMuted : "#7f95bc")
                 font.pixelSize: 11
                 font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"

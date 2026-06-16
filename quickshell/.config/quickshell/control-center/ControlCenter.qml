@@ -12,17 +12,19 @@ import qs.services
 Item {
     id: root
 
+    property Item theme: null
+
     implicitWidth:  420
     implicitHeight: mainCol.implicitHeight + 32
 
-    readonly property color clrBg:      "#14151e"
-    readonly property color clrCard:    "#1c1d2b"
-    readonly property color clrHov:     "#22243a"
-    readonly property color clrViolet:  "#7c6af7"
-    readonly property color clrGreen:   "#4ade80"
-    readonly property color clrText:    "#e8e9f5"
-    readonly property color clrMuted:   "#7e8099"
-    readonly property color clrBorder:  "#2a2c42"
+    readonly property color clrBg:      theme ? theme.bgDark : "#14151e"
+    readonly property color clrCard:    theme ? theme.bgPopup : "#1c1d2b"
+    readonly property color clrHov:     theme ? theme.hover : "#22243a"
+    readonly property color clrViolet:  theme ? theme.active : "#7c6af7"
+    readonly property color clrGreen:   theme ? theme.green : "#4ade80"
+    readonly property color clrText:    theme ? theme.text : "#e8e9f5"
+    readonly property color clrMuted:   theme ? theme.textMuted : "#7e8099"
+    readonly property color clrBorder:  theme ? theme.border : "#2a2c42"
 
     // Ana arkaplan
     Rectangle {
@@ -41,7 +43,7 @@ Item {
                 gradient: Gradient {
                     orientation: Gradient.Horizontal
                     GradientStop { position: 0.0; color: "transparent" }
-                    GradientStop { position: 0.5; color: Qt.rgba(0.49, 0.42, 0.97, 0.45) }
+                    GradientStop { position: 0.5; color: theme ? Qt.rgba(theme.active.r, theme.active.g, theme.active.b, 0.45) : Qt.rgba(0.49, 0.42, 0.97, 0.45) }
                     GradientStop { position: 1.0; color: "transparent" }
                 }
             }
@@ -67,6 +69,7 @@ Item {
                 label:   "Wi-Fi"
                 sub:     NetworkService.connectedSsid
                 active:  NetworkService.enabled
+                theme:   root.theme
                 onToggled: NetworkService.toggle()
             }
             ToggleTile {
@@ -75,6 +78,7 @@ Item {
                 label:   "Bluetooth"
                 sub:     NetworkService.btEnabled ? "On" : "Off"
                 active:  NetworkService.btEnabled
+                theme:   root.theme
                 onToggled: NetworkService.btToggle()
             }
             ToggleTile {
@@ -83,6 +87,7 @@ Item {
                 label:  "Airplane"
                 sub:    "Off"
                 active: false
+                theme:  root.theme
             }
             ToggleTile {
                 Layout.fillWidth: true
@@ -90,6 +95,7 @@ Item {
                 label:   "DND"
                 sub:     AppState.dndEnabled ? "Active" : "Off"
                 active:  AppState.dndEnabled
+                theme:   root.theme
                 onToggled: AppState.toggleDnd()
             }
         }
@@ -102,6 +108,7 @@ Item {
             Layout.fillWidth: true
             icon:  "display-brightness-symbolic"
             value: BrightnessService.value
+            theme: root.theme
             onMoved: function(v) { BrightnessService.setValue(v) }
         }
 
@@ -114,6 +121,7 @@ Item {
                 if (!sink) return 0
                 return sink.audio.muted ? 0 : Math.min(sink.audio.volume, 1.0)
             }
+            theme: root.theme
             onMoved: function(v) {
                 var sink = Pipewire.defaultAudioSink
                 if (sink) {
@@ -127,7 +135,7 @@ Item {
         Rectangle { Layout.fillWidth: true; height: 1; color: root.clrBorder; opacity: 0.6 }
 
         // Medya oynatıcı
-        MediaPlayer { Layout.fillWidth: true }
+        MediaPlayer { Layout.fillWidth: true; theme: root.theme }
 
         // Ayraç
         Rectangle { Layout.fillWidth: true; height: 1; color: root.clrBorder; opacity: 0.6 }
