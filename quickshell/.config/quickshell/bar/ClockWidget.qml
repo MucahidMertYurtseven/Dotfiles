@@ -15,9 +15,7 @@ Rectangle {
     signal clicked()
 
     property bool _showMedia: false       // saat mi medya mı görünsün
-
-    property bool _autoMedia: false       // player başlayınca true, bitince false
-    property bool _userOverride: false    // kullanıcı manuel scroll yaptıysa auto-toggle'u iptal et
+    property bool _prevHasPlayer: false   // önceki tick'te player var mıydı (değişim tespiti için)
 
     property var player: null
 
@@ -81,15 +79,13 @@ Rectangle {
             player = best
         }
 
-        // Auto-toggle: player playing olunca medya görünümüne geç, durunca geri dön
-        // Kullanıcı scroll ile manuel override yaparsa auto-toggle devre dışı kalır
-        var isPlaying = best && bestPri === 2
-        if (isPlaying && !_autoMedia && !_userOverride) {
-            _autoMedia = true
-            _showMedia = true
-        } else if (!isPlaying && _autoMedia) {
-            _autoMedia = false
-            _showMedia = false
+        // Herhangi bir player var mı?
+        var hasPlayer = best !== null
+
+        // Player geldi/gitti → otomatik aç/kapat, scroll override sıfırlanır
+        if (hasPlayer !== _prevHasPlayer) {
+            _prevHasPlayer = hasPlayer
+            _showMedia = hasPlayer
         }
     }
 
@@ -271,7 +267,6 @@ Rectangle {
         onClicked: root.clicked()
         onWheel: (wheel) => {
             _showMedia = !_showMedia
-            _userOverride = true
         }
     }
 }
