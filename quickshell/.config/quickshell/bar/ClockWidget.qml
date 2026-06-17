@@ -5,6 +5,7 @@
 // ============================================================
 import QtQuick
 import QtQuick.Controls
+import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Services.Mpris
 import qs.services
@@ -136,28 +137,46 @@ Rectangle {
         Behavior on opacity { NumberAnimation { duration: 200 } }
         clip: true
 
-        // Ses görselleştirici arkaplan
+        // Ses görselleştirici arkaplan — OpacityMask ile radius koselerine kırpılır
         Item {
-            id: visBg
+            id: visSource
             anchors.fill: parent
-            anchors.leftMargin: 14
-            anchors.rightMargin: 14
-            clip: true
-            opacity: 0.15
-            Repeater {
-                model: 64
-                Rectangle {
-                    x: index * (parent.width / 64)
-                    width: parent.width / 64 - 1
-                    height: _barHeights.length === 64 ? _barHeights[index] : 0
-                    radius: width / 2
-                    color: theme ? theme.text : "#c6c2c5"
-                    anchors.verticalCenter: parent.verticalCenter
-                    Behavior on height {
-                        NumberAnimation { duration: 30; easing.type: Easing.OutSine }
+            visible: false
+
+            Item {
+                id: visBg
+                anchors.fill: parent
+                clip: true
+                Repeater {
+                    model: 64
+                    Rectangle {
+                        x: index * (parent.width / 64)
+                        width: parent.width / 64 - 1
+                        height: _barHeights.length === 64 ? _barHeights[index] : 0
+                        radius: width / 2
+                        color: theme ? theme.text : "#c6c2c5"
+                        anchors.verticalCenter: parent.verticalCenter
+                        Behavior on height {
+                            NumberAnimation { duration: 30; easing.type: Easing.OutSine }
+                        }
                     }
                 }
             }
+        }
+
+        Rectangle {
+            id: visMask
+            anchors.fill: parent
+            radius: 14
+            color: "#ffffff"
+            visible: false
+        }
+
+        OpacityMask {
+            anchors.fill: parent
+            source: visSource
+            maskSource: visMask
+            opacity: 0.15
         }
 
         // Kayan yazı (marquee)
