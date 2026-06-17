@@ -38,13 +38,13 @@ ShellRoot {
         Behavior on textMuted   { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color border:      "#66343434"
         Behavior on border      { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
-        property color hover:       "#5376b6"
+        property color hover:       "#626262"
         Behavior on hover       { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
-        property color active:      "#a6badd"
+        property color active:      "#b0b0b0"
         Behavior on active      { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color activeText:  "#272727"
         Behavior on activeText  { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
-        property color empty:       "#334c79"
+        property color empty:       "#434343"
         Behavior on empty       { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
         property color warn:        "#f38ba8"
         Behavior on warn        { ColorAnimation { duration: 500; easing.type: Easing.OutCubic } }
@@ -77,6 +77,9 @@ ShellRoot {
                 liveTheme.textBright  = t.textBright
                 liveTheme.textMuted   = t.textMuted
                 liveTheme.border      = t.border
+                liveTheme.hover       = t.hover
+                liveTheme.active      = t.active
+                liveTheme.empty       = t.empty
                 liveTheme.activeText  = t.activeText
                 liveTheme.warn        = t.warn
                 liveTheme.green       = t.green
