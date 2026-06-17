@@ -447,18 +447,14 @@ def main():
             palette = get_default_palette()
             source = "none"
 
-    n = 0
-    if live:
-        # Canlı mod: Theme.qml'ye DOKUNMA (reload tetiklenmesin)
-        # Sadece Theme.qml.next yaz (autostart.lua bir sonraki başlangıçta kopyalar)
-        # fallback sync'i de atla (qml dosyalarını değiştirmek reload tetikler)
-        _write_theme_to(THEME_NEXT_FILE, palette, source)
-        # JSON dosyası yaz — QML tarafı Timer+Process ile izler
-        import json as _json
-        Path("/tmp/qs_theme.json").write_text(_json.dumps(palette))
-    else:
-        write_theme(palette, source)
-        n = sync_inline_fallbacks(palette)
+    # Her iki modda da Theme.qml, Theme.qml.next ve /tmp/qs_theme.json güncellenir.
+    # Böylece hangi mod (--live veya normal) kullanılırsa kullanılsın tüm dosyalar tutarlı olur.
+    # --live modu inline fallback sync'i atlar (QML reload tetiklemesin diye).
+    import json as _json
+    write_theme(palette, source)
+    _write_theme_to(THEME_NEXT_FILE, palette, source)
+    Path("/tmp/qs_theme.json").write_text(_json.dumps(palette))
+    n = 0 if live else sync_inline_fallbacks(palette)
 
     if not auto:
         print(f"  → {THEME_FILE}")
