@@ -24,7 +24,7 @@ Item {
     property real _trackPosition: 0
 
     readonly property bool hasPlayer: player !== null
-    readonly property string trackTitle: hasPlayer ? player.trackTitle : "Nothing Playing"
+    readonly property string trackTitle: hasPlayer ? player.trackTitle : ""
     readonly property string trackArtist: hasPlayer ? player.trackArtist : ""
     readonly property bool   isPlaying: hasPlayer ? player.isPlaying : false
     readonly property real pos: _trackPosition

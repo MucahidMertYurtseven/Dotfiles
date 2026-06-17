@@ -32,7 +32,7 @@ Rectangle {
             if (t) return t
             if (a) return a
         }
-        return _showMedia ? "♫ No Player" : ""
+        return ""
     }
 
     // Kayan yazı (marquee) pozisyonu
@@ -270,6 +270,7 @@ Rectangle {
         anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
         onClicked: root.clicked()
         onWheel: (wheel) => {
+            if (!player) return
             _showMedia = !_showMedia
             _userOverride = true
         }
