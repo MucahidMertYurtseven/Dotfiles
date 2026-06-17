@@ -270,7 +270,6 @@ Rectangle {
         anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
         onClicked: root.clicked()
         onWheel: (wheel) => {
-            if (!player) return
             _showMedia = !_showMedia
             _userOverride = true
         }

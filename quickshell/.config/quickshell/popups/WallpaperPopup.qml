@@ -255,11 +255,11 @@ Item {
         var script = `
             mkdir -p /tmp/quickshell/logs
             cp "${esc(path)}" /tmp/qs_current_wallpaper.png 2>/dev/null || true
+            python3 "${Quickshell.shellDir}/scripts/generate_theme.py" --image "${esc(path)}" --auto --live >> ${log} 2>&1
             echo "[$(date +'%H:%M:%S.%3N')] APPLY: ${esc(path)}" >> ${log}
             for _out in $(hyprctl monitors -j 2>/dev/null | python3 -c "import json,sys; [print(m['name']) for m in json.load(sys.stdin)]" 2>/dev/null); do
                 awww img -o "$_out" "${esc(path)}" >/dev/null 2>&1 &
             done; wait
-            python3 "${Quickshell.shellDir}/scripts/generate_theme.py" --image "${esc(path)}" --auto --live >> ${log} 2>&1
         `;
         Quickshell.execDetached(["bash", "-c", script]);
     }

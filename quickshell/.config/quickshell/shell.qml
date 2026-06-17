@@ -23,33 +23,33 @@ ShellRoot {
         id: liveTheme
 
         property color bgDark:      "#242424"
-        Behavior on bgDark      { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on bgDark      { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color bgBar:       "#40242424"
-        Behavior on bgBar       { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on bgBar       { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color bgPopup:     "#2e2e2e"
-        Behavior on bgPopup     { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on bgPopup     { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color bgPopupBlur: "#99242424"
-        Behavior on bgPopupBlur { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on bgPopupBlur { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color text:        "#c5c5c5"
-        Behavior on text        { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on text        { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color textBright:  "#f7f7f7"
-        Behavior on textBright  { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on textBright  { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color textMuted:   "#808080"
-        Behavior on textMuted   { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on textMuted   { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color border:      "#66343434"
-        Behavior on border      { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on border      { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color hover:       "#626262"
-        Behavior on hover       { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on hover       { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color active:      "#b0b0b0"
-        Behavior on active      { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on active      { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color activeText:  "#272727"
-        Behavior on activeText  { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on activeText  { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color empty:       "#434343"
-        Behavior on empty       { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on empty       { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color warn:        "#f38ba8"
-        Behavior on warn        { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on warn        { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
         property color green:       "#4ade80"
-        Behavior on green       { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on green       { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
         readonly property color base:     liveTheme.bgDark
         readonly property color mantle:   liveTheme.bgPopup
@@ -100,7 +100,7 @@ ShellRoot {
     }
     Timer {
         id: themePoller
-        interval: 300
+        interval: 100
         running: true
         repeat: true
         onTriggered: { themeReader.running = true }
@@ -382,7 +382,7 @@ ShellRoot {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     onClicked: {
-                        root.openPopup(clockWidget._showMedia && clockWidget.player ? "media" : "calendar")
+                        root.openPopup(clockWidget._showMedia ? "media" : "calendar")
                     }
                 }
 
