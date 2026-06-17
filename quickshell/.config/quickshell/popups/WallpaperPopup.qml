@@ -253,6 +253,7 @@ Item {
         var esc = function(s) { return String(s).replace(/(["\\$`])/g, '\\$1'); };
         var log = "/tmp/quickshell/logs/wallpaper.log";
         var script = `
+            mkdir -p /tmp/quickshell/logs
             cp "${esc(path)}" /tmp/qs_current_wallpaper.png 2>/dev/null || true
             echo "[$(date +'%H:%M:%S.%3N')] APPLY: ${esc(path)}" >> ${log}
             for _out in $(hyprctl monitors -j 2>/dev/null | python3 -c "import json,sys; [print(m['name']) for m in json.load(sys.stdin)]" 2>/dev/null); do
