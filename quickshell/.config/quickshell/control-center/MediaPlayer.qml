@@ -17,7 +17,7 @@ Item {
 
     property var player: null
 
-    readonly property string trackTitle:  player ? player.trackTitle   : "Nothing Playing"
+    readonly property string trackTitle:  player ? player.trackTitle   : ""
     readonly property string trackArtist: player && player.trackArtists
         ? player.trackArtists.join(", ") : "\u2014"
     readonly property bool   isPlaying:   player ? player.isPlaying : false
