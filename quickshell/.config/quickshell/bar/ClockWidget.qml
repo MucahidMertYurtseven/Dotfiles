@@ -16,6 +16,9 @@ Rectangle {
 
     property bool _showMedia: false       // saat mi medya mı görünsün
 
+    property bool _autoMedia: false       // player başlayınca true, bitince false
+    property bool _userOverride: false    // kullanıcı manuel scroll yaptıysa auto-toggle'u iptal et
+
     property var player: null
 
     readonly property string _trackTitle: player ? player.trackTitle : ""
@@ -76,6 +79,17 @@ Rectangle {
         }
         if (best !== player) {
             player = best
+        }
+
+        // Auto-toggle: player playing olunca medya görünümüne geç, durunca geri dön
+        // Kullanıcı scroll ile manuel override yaparsa auto-toggle devre dışı kalır
+        var isPlaying = best && bestPri === 2
+        if (isPlaying && !_autoMedia && !_userOverride) {
+            _autoMedia = true
+            _showMedia = true
+        } else if (!isPlaying && _autoMedia) {
+            _autoMedia = false
+            _showMedia = false
         }
     }
 
@@ -257,6 +271,7 @@ Rectangle {
         onClicked: root.clicked()
         onWheel: (wheel) => {
             _showMedia = !_showMedia
+            _userOverride = true
         }
     }
 }

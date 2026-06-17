@@ -2,6 +2,9 @@
 ---- AUTOSTART ----
 -------------------
 hl.on("hyprland.start", function ()
+    -- DBus session bus'un calistigindan emin ol (MPRIS icin sart)
+    hl.exec_cmd("dbus-send --session --dest=org.freedesktop.DBus --type=method_call --print-reply /org/freedesktop/DBus org.freedesktop.DBus.ListNames >/dev/null 2>/dev/null || dbus-daemon --session --address=unix:path=/run/user/1000/bus --fork")
+
     -- Live tema JSON'unu boot'ta hazir et (poller ilk saniyede renkleri alir)
     hl.exec_cmd("python3 ~/.config/quickshell/scripts/generate_theme.py --auto --live 2>/dev/null")
 
@@ -15,4 +18,3 @@ hl.on("hyprland.start", function ()
     hl.exec_cmd("wl-paste --type text --watch cliphist store &")
     hl.exec_cmd("wl-paste --type image --watch cliphist store &")
 end)
-
