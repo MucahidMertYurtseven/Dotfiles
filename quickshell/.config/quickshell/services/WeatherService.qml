@@ -235,6 +235,31 @@ Item {
             }
             try {
                 var data = JSON.parse(root._jsonBuf);
+
+                if (data.nearest_area && data.nearest_area.length > 0) {
+                    var area = data.nearest_area[0];
+                    if (area.longitude) {
+                        root.longitude = parseFloat(area.longitude);
+                    }
+                }
+
+                if (data.weather && data.weather.length > 0) {
+                    var astro = data.weather[0].astronomy[0];
+                    if (astro) {
+                        root.sunrise = astro.sunrise || "--:--";
+                        root.sunset = astro.sunset || "--:--";
+                        root.sunrise24h = root.formatTime24h(root.sunrise);
+                        root.sunset24h = root.formatTime24h(root.sunset);
+                        root.moonPhase = data.weather[0].astronomy[0].moon_phase || "";
+                        root.moonPhaseImage = root.mapMoonPhaseImage(root.moonPhase);
+                        root.moonPhaseTR = root.translateMoonPhase(root.moonPhase);
+                        root.moonIllum = data.weather[0].astronomy[0].moon_illumination || "";
+                        
+                        // Güneş ilerlemesini hesapla
+                        root.updateSunProgress();
+                    }
+                }
+
                 if (data.current_condition && data.current_condition.length > 0) {
                     var cur = data.current_condition[0];
                     root.temp = parseInt(cur.temp_C) || 0;
@@ -278,16 +303,16 @@ Item {
                         root.uvDesc = "Dışarısı için güvenli."; 
                     } else if (u <= 5) { 
                         root.uvLevel = "Orta"; 
-                        root.uvDesc = "Öğlen güneşten korunun."; 
+                        root.uvDesc = "Saat " + root.sunset24h + "'a kadar korunun."; 
                     } else if (u <= 7) { 
                         root.uvLevel = "Yüksek"; 
                         root.uvDesc = "Saat " + root.sunset24h + "'a kadar korunun."; 
                     } else if (u <= 10) { 
                         root.uvLevel = "Çok Yüksek"; 
-                        root.uvDesc = "Zararlı ışınlar, iyi korunun."; 
+                        root.uvDesc = "Saat " + root.sunset24h + "'a kadar korunun."; 
                     } else { 
                         root.uvLevel = "Aşırı"; 
-                        root.uvDesc = "Tehlikeli seviye, korunun."; 
+                        root.uvDesc = "Saat " + root.sunset24h + "'a kadar korunun."; 
                     }
 
                     root.windDir = root.translateWindDir(cur.winddir16Point || "");
@@ -299,29 +324,8 @@ Item {
                     else root.visibilityDesc = "Yoğun sis, dikkatli olun.";
                 }
 
-                if (data.nearest_area && data.nearest_area.length > 0) {
-                    var area = data.nearest_area[0];
-                    // root.city = area.areaName && area.areaName.length > 0 ? area.areaName[0].value : root.city;
-                    if (area.longitude) {
-                        root.longitude = parseFloat(area.longitude);
-                    }
-                }
                 if (data.weather && data.weather.length > 0) {
                     var fc = [];
-                    var astro = data.weather[0].astronomy[0];
-                    if (astro) {
-                        root.sunrise = astro.sunrise || "--:--";
-                        root.sunset = astro.sunset || "--:--";
-                        root.sunrise24h = root.formatTime24h(root.sunrise);
-                        root.sunset24h = root.formatTime24h(root.sunset);
-                        root.moonPhase = data.weather[0].astronomy[0].moon_phase || "";
-                        root.moonPhaseImage = root.mapMoonPhaseImage(root.moonPhase);
-                        root.moonPhaseTR = root.translateMoonPhase(root.moonPhase);
-                        root.moonIllum = data.weather[0].astronomy[0].moon_illumination || "";
-                        
-                        // Güneş ilerlemesini hesapla
-                        root.updateSunProgress();
-                    }
 
                     // Bugünün yağış ihtimali ve çiy noktası
                     if (data.weather[0].hourly && data.weather[0].hourly.length > 0) {

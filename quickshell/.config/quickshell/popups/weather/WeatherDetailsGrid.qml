@@ -33,7 +33,7 @@ GridLayout {
         property string mainValueUnit
         property string subValueText
         property string descText
-        property int descFontSize: 10
+        property real descFontSize: 10
         property int descAlignment: Text.AlignTop
         property int subValueFontSize: 14
         property bool subValueFontBold: true
@@ -51,11 +51,14 @@ GridLayout {
         border.color: theme ? theme.border : "#1affffff"; border.width: 1
 
         ColumnLayout {
-            anchors.fill: parent
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: descItem.top
             anchors.leftMargin: 14
             anchors.rightMargin: 14
             anchors.topMargin: 14
-            anchors.bottomMargin: 30 // Alt yazı için yer bırak
+            anchors.bottomMargin: 4
             spacing: 4
 
             RowLayout {
@@ -183,6 +186,7 @@ GridLayout {
 
         // Kartın Altına Sabitlenmiş Açıklama Yazısı
         Text {
+            id: descItem
             visible: descText !== ""
             anchors.left: parent.left
             anchors.right: parent.right
@@ -224,6 +228,7 @@ GridLayout {
         }
         descText: WeatherService.uvDesc
         descAlignment: Text.AlignTop
+        descFontSize: 8.5
         barProgress: {
             var val = parseInt(WeatherService.uvIndex);
             return isNaN(val) ? 0 : Math.min((val / 11.0) * 100, 100);
