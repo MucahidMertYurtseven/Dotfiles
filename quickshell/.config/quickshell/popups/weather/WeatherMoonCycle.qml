@@ -128,7 +128,7 @@ ColumnLayout {
             anchors.leftMargin: 8
             anchors.rightMargin: 8
             anchors.topMargin: 0
-            spacing: 30
+            spacing: WeatherService.isDay ? 30 : 10
 
             RowLayout {
                 Layout.topMargin: -2

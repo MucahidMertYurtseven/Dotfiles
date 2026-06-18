@@ -34,7 +34,9 @@ GridLayout {
         property string subValueText
         property string descText
         property int descFontSize: 10
-        property int descAlignment: Text.AlignBottom
+        property int descAlignment: Text.AlignTop
+        property int subValueFontSize: 14
+        property bool subValueFontBold: true
         property bool isValueBold: true
         property bool showCompass: false
 
@@ -50,7 +52,10 @@ GridLayout {
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 14
+            anchors.leftMargin: 14
+            anchors.rightMargin: 14
+            anchors.topMargin: 14
+            anchors.bottomMargin: 30 // Alt yazı için yer bırak
             spacing: 4
 
             RowLayout {
@@ -100,8 +105,8 @@ GridLayout {
                 Layout.bottomMargin: 2
                 text: subValueText
                 color: theme ? theme.active : "#38bdf8"
-                font.pixelSize: 14
-                font.bold: true
+                font.pixelSize: subValueFontSize
+                font.bold: subValueFontBold
                 font.family: "Inter"
             }
 
@@ -173,27 +178,34 @@ GridLayout {
                     }
                 }
 
-                Text {
-                    visible: descText !== ""
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 28
-                    verticalAlignment: descAlignment
-                    text: descText
-                    color: theme ? theme.text : "#9ca3af"
-                    font.pixelSize: descFontSize
-                    font.family: "Inter"
-                    wrapMode: Text.WordWrap
-                    maximumLineCount: 2
-                    elide: Text.ElideRight
-                }
             }
+        }
+
+        // Kartın Altına Sabitlenmiş Açıklama Yazısı
+        Text {
+            visible: descText !== ""
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 14
+            anchors.rightMargin: 14
+            anchors.bottomMargin: 8 // Kutunun alt sınırından 8px yukarıda
+            text: descText
+            color: theme ? theme.text : "#9ca3af"
+            font.pixelSize: descFontSize
+            font.family: "Inter"
+            wrapMode: Text.WordWrap
+            maximumLineCount: 2
+            elide: Text.ElideRight
+            verticalAlignment: Text.AlignBottom
+            horizontalAlignment: Text.AlignLeft
         }
     }
 
     WeatherCard {
         iconName: "device_thermostat"
         title: "HİSSEDİLEN"
-        mainValue: WeatherService.feelsLike + "°"
+        mainValue: WeatherService.feelsLikeFormatted
         descText: WeatherService.feelsLikeDesc
     }
 
@@ -211,7 +223,6 @@ GridLayout {
             return "Aşırı";
         }
         descText: WeatherService.uvDesc
-        descFontSize: 8
         descAlignment: Text.AlignTop
         barProgress: {
             var val = parseInt(WeatherService.uvIndex);
@@ -240,9 +251,10 @@ GridLayout {
     WeatherCard {
         iconName: "water_drop"
         title: "YAĞIŞ İHTİMALİ"
-        mainValue: "%" + WeatherService.rainChance
+        mainValue: WeatherService.rainChanceFormatted
         subValueText: WeatherService.rainLevel
-        descText: ""
+        descText: WeatherService.rainDesc
+        descAlignment: Text.AlignTop
         barProgress: parseInt(WeatherService.rainChance) || 0
         barColor1: "#3b82f6"
         barColor2: "#60a5fa"
@@ -252,6 +264,9 @@ GridLayout {
         iconName: "humidity_percentage"
         title: "NEM ORANI"
         mainValue: "%" + WeatherService.humidity
-        descText: "Çiy noktası: " + WeatherService.dewPoint + "°"
+        subValueText: WeatherService.dewPointFormatted
+        subValueFontSize: 12
+        subValueFontBold: false
+        descText: WeatherService.humidityDesc
     }
 }

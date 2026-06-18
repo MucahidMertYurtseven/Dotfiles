@@ -27,6 +27,13 @@ Item {
     property string rainChance: "0"
     property string dewPoint: "0"
 
+    // Optimize Edilmiş (Önceden Hesaplanmış) UI Formatları
+    property string tempFormatted: "0°"
+    property string feelsLikeFormatted: "0°"
+    property string dewPointFormatted: "Çiy: 0°"
+    property string rainChanceFormatted: "%0"
+    property string forecastMinMax: "Y: -° D: -°"
+
     property var forecast: []
     property string sunrise: "--:--"
     property string sunset: "--:--"
@@ -37,13 +44,15 @@ Item {
     property string moonPhaseImage: "dolunay.png"
     property string moonIllum: "0"
 
-    // Dinamik Açıklamalar
+    // Dinamik Açıklamalar (Apple-Style)
     property string feelsLikeDesc: "Yükleniyor..."
     property string uvLevel: "Düşük"
     property string uvDesc: "Yükleniyor..."
     property string visibilityDesc: "Yükleniyor..."
-    property string rainLevel: "Düşük"
+    property string rainLevel: "Beklenmiyor"
+    property string rainDesc: "Yükleniyor..."
     property string humidityDesc: "Yükleniyor..."
+    property real longitude: 0
 
     // Güneş konumu (0.0: Doğuş, 1.0: Batış, veya gece ise 0.0/1.0 dışı)
     property real sunProgress: 0.5
@@ -51,8 +60,9 @@ Item {
     property bool isDay: true
     property real nightProgress: 0.0
 
-    function parseWttrTime(timeStr) {
-        if (!timeStr || timeStr.indexOf(":") === -1) return new Date();
+    function parseWttrTime(timeStr, baseDate) {
+        var d = baseDate ? new Date(baseDate.getTime()) : new Date();
+        if (!timeStr || timeStr.indexOf(":") === -1) return d;
         var parts = timeStr.trim().split(" ");
         var timeParts = parts[0].split(":");
         var hours = parseInt(timeParts[0], 10);
@@ -64,7 +74,6 @@ Item {
             if (ampm === "AM" && hours === 12) hours = 0;
         }
         
-        var d = new Date();
         d.setHours(hours, minutes, 0, 0);
         return d;
     }
@@ -102,10 +111,21 @@ Item {
         return _daysTR[d.getDay()];
     }
 
+    function getCityLocalTime() {
+        var localNow = new Date();
+        if (root.longitude === 0) return localNow;
+        
+        // UTC time'ı bul
+        var utcMs = localNow.getTime() + (localNow.getTimezoneOffset() * 60000);
+        // Boylamdan saat farkını tahmin et (Her 15 derece = 1 saat)
+        var offsetHours = Math.round(root.longitude / 15);
+        return new Date(utcMs + (offsetHours * 3600000));
+    }
+
     function updateSunProgress() {
-        var now = new Date();
-        var sunriseDate = parseWttrTime(root.sunrise);
-        var sunsetDate = parseWttrTime(root.sunset);
+        var now = getCityLocalTime();
+        var sunriseDate = parseWttrTime(root.sunrise, now);
+        var sunsetDate = parseWttrTime(root.sunset, now);
         
         if (now >= sunriseDate && now <= sunsetDate) {
             root.isDay = true;
@@ -230,40 +250,62 @@ Item {
                     root.icon = root.mapWeatherIcon(weatherCode);
                     root.materialIcon = root.mapMaterialWeatherIcon(weatherCode);
 
+                    // Optimize Edilmiş Değişkenler
+                    root.tempFormatted = root.temp + "°";
+                    root.feelsLikeFormatted = root.feelsLike + "°";
+
                     if (cur.lang_tr && cur.lang_tr.length > 0) {
                         root.desc = cur.lang_tr[0].value;
                     } else if (cur.weatherDesc && cur.weatherDesc.length > 0) {
                         root.desc = cur.weatherDesc[0].value;
                     }
 
-                    // Dinamik Açıklamalar ve Çeviriler
+                    // Dinamik Açıklamalar ve Çeviriler (Apple Style - Kısa)
                     var fDiff = parseInt(root.feelsLike) - root.temp;
-                    if (fDiff < -2) root.feelsLikeDesc = "Rüzgar daha serin hissettiriyor.";
+                    if (fDiff < -2) root.feelsLikeDesc = "Rüzgar havayı serinletiyor.";
                     else if (fDiff > 2) root.feelsLikeDesc = "Nem daha sıcak hissettiriyor.";
-                    else root.feelsLikeDesc = "Beklenen sıcaklık ile aynı.";
+                    else root.feelsLikeDesc = "Beklenen sıcaklıkla aynı.";
 
                     var h = parseInt(root.humidity);
-                    if (h < 30) root.humidityDesc = "Düşük nem oranı, kuru hava.";
-                    else if (h <= 60) root.humidityDesc = "Optimum nem oranı.";
-                    else if (h <= 80) root.humidityDesc = "Yüksek nemli hava.";
-                    else root.humidityDesc = "Aşırı nemli hava.";
+                    if (h < 30) root.humidityDesc = "Kuru hava, nemlendirici sürün.";
+                    else if (h <= 60) root.humidityDesc = "İdeal nem seviyesi.";
+                    else if (h <= 80) root.humidityDesc = "Hava biraz bunaltıcı.";
+                    else root.humidityDesc = "Aşırı nemli, çok bunaltıcı.";
                     
                     var u = parseInt(root.uvIndex);
-                    if (u <= 2) { root.uvLevel = "Düşük"; root.uvDesc = "UV seviyesi çok düşük."; }
-                    else if (u <= 5) { root.uvLevel = "Orta"; root.uvDesc = "UV seviyesi orta düzeyde."; }
-                    else if (u <= 7) { root.uvLevel = "Yüksek"; root.uvDesc = "UV seviyesi yüksek."; }
-                    else if (u <= 10) { root.uvLevel = "Çok Yüksek"; root.uvDesc = "UV seviyesi çok yüksek."; }
-                    else { root.uvLevel = "Aşırı"; root.uvDesc = "UV seviyesi tehlikeli boyutta."; }
+                    if (u <= 2) { 
+                        root.uvLevel = "Düşük"; 
+                        root.uvDesc = "Dışarısı için güvenli."; 
+                    } else if (u <= 5) { 
+                        root.uvLevel = "Orta"; 
+                        root.uvDesc = "Öğlen güneşten korunun."; 
+                    } else if (u <= 7) { 
+                        root.uvLevel = "Yüksek"; 
+                        root.uvDesc = "Saat " + root.sunset24h + "'a kadar korunun."; 
+                    } else if (u <= 10) { 
+                        root.uvLevel = "Çok Yüksek"; 
+                        root.uvDesc = "Zararlı ışınlar, iyi korunun."; 
+                    } else { 
+                        root.uvLevel = "Aşırı"; 
+                        root.uvDesc = "Tehlikeli seviye, korunun."; 
+                    }
 
                     root.windDir = root.translateWindDir(cur.winddir16Point || "");
 
                     var v = parseInt(root.visibility);
-                    if (v >= 10) root.visibilityDesc = "Hava son derece net.";
-                    else if (v >= 5) root.visibilityDesc = "Normal görüş.";
-                    else if (v >= 2) root.visibilityDesc = "Hafif puslu.";
-                    else root.visibilityDesc = "Yoğun sisli.";
+                    if (v >= 10) root.visibilityDesc = "Görüş tamamen açık.";
+                    else if (v >= 5) root.visibilityDesc = "Hafif puslu bir hava.";
+                    else if (v >= 2) root.visibilityDesc = "Görüş mesafesi düşük.";
+                    else root.visibilityDesc = "Yoğun sis, dikkatli olun.";
                 }
 
+                if (data.nearest_area && data.nearest_area.length > 0) {
+                    var area = data.nearest_area[0];
+                    // root.city = area.areaName && area.areaName.length > 0 ? area.areaName[0].value : root.city;
+                    if (area.longitude) {
+                        root.longitude = parseFloat(area.longitude);
+                    }
+                }
                 if (data.weather && data.weather.length > 0) {
                     var fc = [];
                     var astro = data.weather[0].astronomy[0];
@@ -284,13 +326,32 @@ Item {
                     // Bugünün yağış ihtimali ve çiy noktası
                     if (data.weather[0].hourly && data.weather[0].hourly.length > 0) {
                         root.rainChance = data.weather[0].hourly[0].chanceofrain || "0";
+                        root.rainChanceFormatted = "%" + root.rainChance;
                         root.dewPoint = data.weather[0].hourly[0].DewPointC || "0";
+                        root.dewPointFormatted = "Çiy: " + root.dewPoint + "°";
+
                         var r = parseInt(root.rainChance);
-                        if (r === 0) root.rainLevel = "Beklenmiyor";
-                        else if (r <= 20) root.rainLevel = "Çok Düşük";
-                        else if (r <= 50) root.rainLevel = "Orta";
-                        else if (r <= 80) root.rainLevel = "Yüksek";
-                        else root.rainLevel = "Kesin";
+                        if (r === 0) {
+                            root.rainLevel = "Beklenmiyor";
+                            root.rainDesc = "Yağış beklenmiyor.";
+                        } else if (r <= 20) {
+                            root.rainLevel = "Çok Düşük";
+                            root.rainDesc = "Hafif yağış geçişleri.";
+                        } else if (r <= 50) {
+                            root.rainLevel = "Orta";
+                            root.rainDesc = "Aralıklı yağış ihtimali.";
+                        } else if (r <= 80) {
+                            root.rainLevel = "Yüksek";
+                            root.rainDesc = "Şemsiyenizi unutmayın.";
+                        } else {
+                            root.rainLevel = "Kesin";
+                            root.rainDesc = "Kuvvetli yağış bekleniyor.";
+                        }
+                    }
+
+                    // Precompute Forecast Strings
+                    if (data.weather.length > 0) {
+                        root.forecastMinMax = "Y: " + data.weather[0].maxtempC + "° D: " + data.weather[0].mintempC + "°";
                     }
 
                     for (var i = 0; i < Math.min(data.weather.length, 3); i++) {

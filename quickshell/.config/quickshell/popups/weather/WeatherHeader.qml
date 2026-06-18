@@ -34,7 +34,7 @@ Item {
             spacing: 12
 
             Text {
-                text: WeatherService.temp + "°"
+                text: WeatherService.tempFormatted
                 color: theme ? theme.active : "#f7f7f7"
                 font.pixelSize: 64
                 font.bold: true
@@ -67,7 +67,7 @@ Item {
                     }
                 }
                 Text {
-                    text: "Y: " + (WeatherService.forecast.length > 0 ? WeatherService.forecast[0].max : "-") + "° D: " + (WeatherService.forecast.length > 0 ? WeatherService.forecast[0].min : "-") + "°"
+                    text: WeatherService.forecastMinMax
                     color: theme ? theme.text : "#9ca3af"
                     font.pixelSize: 11
                     font.family: "Inter"

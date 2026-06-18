@@ -623,6 +623,7 @@ ShellRoot {
                     }
                 }
                 Loader {
+                    id: weatherLoader
                     anchors.fill: parent
                     active: true
                     sourceComponent: WeatherPopup {
@@ -658,7 +659,7 @@ ShellRoot {
                 id: citySearchContainer
                 visible: AppState.citySearchOpen
                 width: 320
-                height: popupItem.height
+                height: (AppState.activePopup === "weather" && weatherLoader.item) ? weatherLoader.item.implicitHeight : popupItem.height
                 anchors.top: parent.top
                 x: popupItem.x + popupItem.width + 15
                 opacity: visible ? 1 : 0

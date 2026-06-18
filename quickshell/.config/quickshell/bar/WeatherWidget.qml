@@ -10,8 +10,8 @@ import qs.components
 Rectangle {
     id: root
     property Item theme: null
-
     signal clicked()
+    readonly property string _icon: Quickshell.shellDir + "/bar/icons/"
 
     height: 32
     implicitWidth: row.implicitWidth + 24
@@ -27,12 +27,11 @@ Rectangle {
         anchors.centerIn: parent
         spacing: 6
 
-        Text {
+        ColorizedIcon {
             anchors.verticalCenter: parent.verticalCenter
-            text: WeatherService.materialIcon
-            font.family: "Material Symbols Outlined"
-            font.pixelSize: 18
-            color: theme ? theme.active : "#dda6d5"
+            source: root._icon + "weather/" + WeatherService.icon
+            iconSize: 18
+            iconColor: theme ? theme.active : "#dda6d5"
         }
 
         Text {
