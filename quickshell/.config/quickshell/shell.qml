@@ -23,33 +23,33 @@ ShellRoot {
         id: liveTheme
 
         property color bgDark:      "#242424"
-        Behavior on bgDark      { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on bgDark      { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color bgBar:       "#40242424"
-        Behavior on bgBar       { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on bgBar       { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color bgPopup:     "#2e2e2e"
-        Behavior on bgPopup     { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on bgPopup     { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color bgPopupBlur: "#99242424"
-        Behavior on bgPopupBlur { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on bgPopupBlur { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color text:        "#c5c5c5"
-        Behavior on text        { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on text        { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color textBright:  "#f7f7f7"
-        Behavior on textBright  { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on textBright  { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color textMuted:   "#808080"
-        Behavior on textMuted   { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on textMuted   { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color border:      "#66343434"
-        Behavior on border      { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on border      { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color hover:       "#626262"
-        Behavior on hover       { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on hover       { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color active:      "#b0b0b0"
-        Behavior on active      { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on active      { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color activeText:  "#272727"
-        Behavior on activeText  { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on activeText  { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color empty:       "#434343"
-        Behavior on empty       { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on empty       { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color warn:        "#f38ba8"
-        Behavior on warn        { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on warn        { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
         property color green:       "#4ade80"
-        Behavior on green       { ColorAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on green       { ColorAnimation { duration: 1200; easing.type: Easing.OutQuart } }
 
         readonly property color base:     liveTheme.bgDark
         readonly property color mantle:   liveTheme.bgPopup
@@ -85,12 +85,16 @@ ShellRoot {
                 liveTheme.green       = t.green
                 t.destroy()
             }
+            // Başlangıçta her zaman en güncel JSON temasını oku
+            themeApplyProc.running = true
         }
 
         property int revision: 0
     }
 
     // Tema JSON dosyasını izle — generate_theme.py --live bu dosyayı yazar
+    // inotifywait ile event-driven izleme: dosya değişince anında (≤10ms) tetiklenir,
+    // polling yok, CPU yükü sıfır.
     property string _lastThemeJson: ""
     property bool _preloadedWallpaper: false
     Timer {
@@ -98,15 +102,41 @@ ShellRoot {
         interval: 4000
         onTriggered: root._preloadedWallpaper = true
     }
-    Timer {
-        id: themePoller
-        interval: 100
-        running: true
-        repeat: true
-        onTriggered: { themeReader.running = true }
-    }
+
+    // inotifywait: /tmp/qs_theme.json dosyası her yazıldığında bir satır basar
+    // → themeApplyProc okur ve temayı anında günceller
     Process {
-        id: themeReader
+        id: themeWatcher
+        command: ["sh", "-c",
+            // Dosya yoksa önce oluştur (inotifywait var olan dosyayı izler)
+            "mkdir -p /tmp && touch /tmp/qs_theme.json; " +
+            "inotifywait -m -q -e close_write --format '%f' /tmp/qs_theme.json 2>/dev/null"
+        ]
+        running: true
+        stdout: SplitParser {
+            onRead: function(line) {
+                // Dosya yazıldı sinyali geldi — hemen oku
+                themeApplyProc.running = true
+            }
+        }
+        // inotifywait çökürlerse yeniden başlat
+        onRunningChanged: {
+            if (!running) {
+                watcherRestartTimer.restart()
+            }
+        }
+    }
+    // inotifywait crash/exit durumunda 2sn sonra yeniden başlat
+    Timer {
+        id: watcherRestartTimer
+        interval: 2000
+        repeat: false
+        onTriggered: { themeWatcher.running = true }
+    }
+
+    // Gerçek tema okuyucu — inotifywait sinyal verince çalışır
+    Process {
+        id: themeApplyProc
         command: ["sh", "-c", "cat /tmp/qs_theme.json 2>/dev/null || echo ''"]
         running: false
         stdout: StdioCollector {
@@ -132,9 +162,9 @@ ShellRoot {
                     if (p.warn        !== undefined) { liveTheme.warn        = p.warn;        changed++ }
                     if (p.green       !== undefined) { liveTheme.green       = p.green;       changed++ }
                     liveTheme.revision++
-                    console.log("Theme file updated:", changed, "properties, rev:", liveTheme.revision)
+                    console.log("Theme updated (inotify):", changed, "props, rev:", liveTheme.revision)
                 } catch (e) {
-                    console.log("Theme file parse error:", String(e))
+                    console.log("Theme parse error:", String(e))
                 }
             }
         }
@@ -150,43 +180,33 @@ ShellRoot {
         AppState.activePopup = AppState.activePopup === name ? "" : name
     }
 
-    // File-based launcher trigger (Hyprland bind touch eder)
-    property bool _launcherTriggered: false
-    Timer {
-        interval: 300
+    // File-based launcher trigger via inotifywait (Sıfır CPU Kullanımı!)
+    Process {
+        id: launcherWatcher
+        command: ["sh", "-c", "touch /tmp/quickshell-launcher; inotifywait -m -q -e attrib --format '%w' /tmp/quickshell-launcher 2>/dev/null"]
         running: true
-        repeat: true
-        onTriggered: {
-            launcherCheck.running = true
-            wallpaperCheck.running = true
-        }
-    }
-    Process {
-        id: launcherCheck
-        command: ["sh", "-c", "if [ -f /tmp/quickshell-launcher ]; then rm /tmp/quickshell-launcher && echo 1; else echo 0; fi"]
-        running: false
         stdout: SplitParser {
             onRead: function(line) {
-                if (line.trim() === "1") {
-                    root.openPopup("launcher")
-                }
+                root.openPopup("launcher")
             }
         }
+        onRunningChanged: if(!running) restartTimerLauncher.restart()
     }
+    Timer { id: restartTimerLauncher; interval: 2000; onTriggered: launcherWatcher.running = true }
 
-    // File-based wallpaper trigger (Hyprland SUPER+W touch eder)
+    // File-based wallpaper trigger via inotifywait (Sıfır CPU Kullanımı!)
     Process {
-        id: wallpaperCheck
-        command: ["sh", "-c", "if [ -f /tmp/quickshell-wallpaper ]; then rm /tmp/quickshell-wallpaper && echo 1; else echo 0; fi"]
-        running: false
+        id: wallpaperWatcher
+        command: ["sh", "-c", "touch /tmp/quickshell-wallpaper; inotifywait -m -q -e attrib --format '%w' /tmp/quickshell-wallpaper 2>/dev/null"]
+        running: true
         stdout: SplitParser {
             onRead: function(line) {
-                if (line.trim() === "1") {
-                    root.openPopup("wallpaper")
-                }
+                root.openPopup("wallpaper")
             }
         }
+        onRunningChanged: if(!running) restartTimerWallpaper.restart()
     }
+    Timer { id: restartTimerWallpaper; interval: 2000; onTriggered: wallpaperWatcher.running = true }
 
     // Her popup tipi için genişlik döndür
     function popupWidth(type) {
@@ -201,6 +221,7 @@ ShellRoot {
             case "battery": return 320
             case "power": return 320
             case "media": return 320
+            case "weather": return 620
             case "launcher": return 400
             case "wallpaper": return Screen.width * 0.60
             default: return 1
@@ -219,6 +240,7 @@ ShellRoot {
             case "battery": return 190
             case "power": return 225
             case "media": return 200
+            case "weather": return 525
             case "launcher": return 450
             case "wallpaper": return Screen.height * 0.50
             default: return 1
@@ -372,6 +394,10 @@ ShellRoot {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 6
                     WorkspaceIndicator { theme: liveTheme }
+                    WeatherWidget {
+                        theme: liveTheme
+                        onClicked: root.openPopup("weather")
+                    }
                     SysResourceWidget { theme: liveTheme }
                 }
 
@@ -422,19 +448,21 @@ ShellRoot {
     Variants { model: Quickshell.screens;
         PanelWindow {
             property var modelData; screen: modelData
-            visible: AppState.activePopup !== ""
+            visible: AppState.activePopup !== "" || AppState.citySearchOpen
             anchors.top: true; anchors.bottom: true; anchors.left: true; anchors.right: true
+            margins.top: 48
             color: "transparent"
             WlrLayershell.namespace: "quickshell:popup"
             WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.keyboardFocus: AppState.activePopup !== "" ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+            WlrLayershell.keyboardFocus: AppState.activePopup !== "" || AppState.citySearchOpen ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-            // Popup dışına tıklayınca kapat (bar alanını kapsamaz)
+            // Popup dışına tıklayınca kapat
             MouseArea {
-                anchors.top: parent.top; anchors.topMargin: 48
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left; anchors.right: parent.right
-                onClicked: root.closeActivePopup()
+                anchors.fill: parent
+                onClicked: {
+                    if (AppState.citySearchOpen) AppState.citySearchOpen = false
+                    else root.closeActivePopup()
+                }
             }
 
             // Popup içerik kutusu
@@ -442,14 +470,17 @@ ShellRoot {
                 id: popupItem
                 width: popupWidth(AppState.activePopup) || 1
                 height: popupHeight(AppState.activePopup) || 1
-                anchors.top: parent.top; anchors.topMargin: AppState.activePopup === "wallpaper" ? Math.max(48, (parent.height - height) / 2) : 48
-                anchors.right: parent.right; anchors.rightMargin: {
+                anchors.top: parent.top; anchors.topMargin: AppState.activePopup === "wallpaper" ? (parent.height - height) / 2 : 0
+                x: {
                     var p = AppState.activePopup
                     var w = popupWidth(p) || 1
+                    if (p === "weather") {
+                        return 15
+                    }
                     if (p === "" || p === "calendar" || p === "media" || p === "launcher" || p === "wallpaper") {
                         return Math.floor((parent.width - w) / 2)
                     }
-                    return 15
+                    return parent.width - w - 15
                 }
                 opacity: 0
                 scale: 0.88
@@ -475,32 +506,26 @@ ShellRoot {
                     }
                 }
 
-                // Açılma animasyonu (scale + fade, OutCubic — bounce yok)
+                // Açılma animasyonu (QML tarafındaki animasyonlar kapatıldı)
                 SequentialAnimation {
                     id: popupOpenAnim
                     running: false
-                    PropertyAction { target: popupItem; property: "scale"; value: 0.88 }
-                    PropertyAction { target: popupItem; property: "opacity"; value: 0 }
-                    ParallelAnimation {
-                        NumberAnimation { target: popupItem; property: "scale"; duration: 300; to: 1; easing.type: Easing.OutCubic }
-                        NumberAnimation { target: popupItem; property: "opacity"; duration: 240; to: 1; easing.type: Easing.OutCubic }
-                    }
+                    PropertyAction { target: popupItem; property: "scale"; value: 1 }
+                    PropertyAction { target: popupItem; property: "opacity"; value: 1 }
                 }
 
-                // Kapanma animasyonu (scale + fade)
+                // Kapanma animasyonu
                 SequentialAnimation {
                     id: popupCloseAnim
                     running: false
-                    ParallelAnimation {
-                        NumberAnimation { target: popupItem; property: "scale"; duration: 180; to: 0.88; easing.type: Easing.OutCubic }
-                        NumberAnimation { target: popupItem; property: "opacity"; duration: 150; to: 0; easing.type: Easing.OutCubic }
-                    }
+                    PropertyAction { target: popupItem; property: "scale"; value: 1 }
+                    PropertyAction { target: popupItem; property: "opacity"; value: 0 }
                 }
 
                 // Popup içerikleri — Loader ile sync yüklenir, animasyon başlamadan hazır olur
                 Loader {
                     anchors.fill: parent
-                    active: AppState.activePopup === "calendar"
+                    active: true
                     sourceComponent: CalendarPopup {
                         visible: AppState.activePopup === "calendar"
                         theme: liveTheme
@@ -509,7 +534,7 @@ ShellRoot {
                 }
                 Loader {
                     anchors.fill: parent
-                    active: AppState.activePopup === "notifications"
+                    active: true
                     sourceComponent: NotificationPopup {
                         visible: AppState.activePopup === "notifications"
                         theme: liveTheme
@@ -523,7 +548,7 @@ ShellRoot {
                 }
                 Loader {
                     anchors.fill: parent
-                    active: AppState.activePopup === "wifi"
+                    active: true
                     sourceComponent: WifiPopup {
                         visible: AppState.activePopup === "wifi"
                         theme: liveTheme
@@ -532,7 +557,7 @@ ShellRoot {
                 }
                 Loader {
                     anchors.fill: parent
-                    active: AppState.activePopup === "bluetooth"
+                    active: true
                     sourceComponent: BluetoothPopup {
                         visible: AppState.activePopup === "bluetooth"
                         theme: liveTheme
@@ -541,7 +566,7 @@ ShellRoot {
                 }
                 Loader {
                     anchors.fill: parent
-                    active: AppState.activePopup === "volume"
+                    active: true
                     sourceComponent: VolumePopup {
                         visible: AppState.activePopup === "volume"
                         theme: liveTheme
@@ -550,7 +575,7 @@ ShellRoot {
                 }
                 Loader {
                     anchors.fill: parent
-                    active: AppState.activePopup === "brightness"
+                    active: true
                     sourceComponent: BrightnessPopup {
                         visible: AppState.activePopup === "brightness"
                         theme: liveTheme
@@ -559,7 +584,7 @@ ShellRoot {
                 }
                 Loader {
                     anchors.fill: parent
-                    active: AppState.activePopup === "battery"
+                    active: true
                     sourceComponent: PowerPopup {
                         visible: AppState.activePopup === "battery"
                         theme: liveTheme
@@ -572,7 +597,7 @@ ShellRoot {
                 }
                 Loader {
                     anchors.fill: parent
-                    active: AppState.activePopup === "power"
+                    active: true
                     sourceComponent: PowerMenuPopup {
                         visible: AppState.activePopup === "power"
                         theme: liveTheme
@@ -581,7 +606,7 @@ ShellRoot {
                 }
                 Loader {
                     anchors.fill: parent
-                    active: AppState.activePopup === "media"
+                    active: true
                     sourceComponent: MediaPopup {
                         visible: AppState.activePopup === "media"
                         theme: liveTheme
@@ -590,9 +615,18 @@ ShellRoot {
                 }
                 Loader {
                     anchors.fill: parent
-                    active: AppState.activePopup === "launcher"
+                    active: true
                     sourceComponent: AppLauncherPopup {
                         visible: AppState.activePopup === "launcher"
+                        theme: liveTheme
+                        open: true
+                    }
+                }
+                Loader {
+                    anchors.fill: parent
+                    active: true
+                    sourceComponent: WeatherPopup {
+                        visible: AppState.activePopup === "weather"
                         theme: liveTheme
                         open: true
                     }
@@ -612,11 +646,36 @@ ShellRoot {
                 // ESC tuşu ile popup kapat
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Escape) {
-                        root.closeActivePopup()
+                        if (AppState.citySearchOpen) AppState.citySearchOpen = false
+                        else root.closeActivePopup()
                         event.accepted = true
                     }
                 }
                 Keys.priority: Keys.BeforeItem
+            }
+
+            Item {
+                id: citySearchContainer
+                visible: AppState.citySearchOpen
+                width: 320
+                height: popupItem.height
+                anchors.top: parent.top
+                x: popupItem.x + popupItem.width + 15
+                opacity: visible ? 1 : 0
+                scale: visible ? 1 : 0.88
+                transformOrigin: Item.Top
+                Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutQuart } }
+                Behavior on scale { NumberAnimation { duration: 250; easing.type: Easing.OutQuart } }
+
+                Loader {
+                    anchors.fill: parent
+                    active: true
+                    sourceComponent: CitySearchPopup {
+                        visible: AppState.citySearchOpen
+                        theme: liveTheme
+                        open: AppState.citySearchOpen
+                    }
+                }
             }
 
             // Kısayol: Alt+Space ile uygulama başlatıcı

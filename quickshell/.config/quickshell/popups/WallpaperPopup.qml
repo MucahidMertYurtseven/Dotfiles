@@ -173,24 +173,24 @@ Item {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             grid.currentIndex = index;
-                            applyWallpaper(model.path);
+                            applyWallpaper(model.path, model.thumb.replace("file://", ""));
                         }
                     }
                 }
 
                 Keys.onReturnPressed: (event) => {
                     grid.currentIndex = index;
-                    applyWallpaper(model.path);
+                    applyWallpaper(model.path, model.thumb.replace("file://", ""));
                 }
             }
 
             Keys.onReturnPressed: {
                 var item = wallpaperModel.get(currentIndex)
-                if (item) applyWallpaper(item.path)
+                if (item) applyWallpaper(item.path, root.thumbDir + "/" + item.name)
             }
             Keys.onSpacePressed: {
                 var item = wallpaperModel.get(currentIndex)
-                if (item) applyWallpaper(item.path)
+                if (item) applyWallpaper(item.path, root.thumbDir + "/" + item.name)
             }
             Keys.onEscapePressed: (event) => {
                 AppState.activePopup = ""
@@ -203,7 +203,6 @@ Item {
             }
         }
 
-        // Scrollbar (draggable, track-clickable)
         Rectangle {
             id: scrollbar
             anchors.right: parent.right; anchors.rightMargin: 4
@@ -213,7 +212,6 @@ Item {
             color: Qt.rgba(textColor.r, textColor.g, textColor.b, 0.15)
             visible: !loading && wallpaperModel.count > 0 && grid.visibleArea.heightRatio < 1.0
 
-            // Track click — jump to position
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
@@ -247,21 +245,19 @@ Item {
         }
     }
 
-    function applyWallpaper(path) {
+    function applyWallpaper(path, thumbPath) {
         if (!path) return;
         AppState.activePopup = "";
-        var esc = function(s) { return String(s).replace(/(["\\$`])/g, '\\$1'); };
-        var log = "/tmp/quickshell/logs/wallpaper.log";
-        var script = `
-            mkdir -p /tmp/quickshell/logs
-            cp "${esc(path)}" /tmp/qs_current_wallpaper.png 2>/dev/null || true
-            echo "[$(date +'%H:%M:%S.%3N')] APPLY: ${esc(path)}" >> ${log}
-            python3 "${Quickshell.shellDir}/scripts/generate_theme.py" --image "${esc(path)}" --auto --live >> ${log} 2>&1 &
-            for _out in $(hyprctl monitors -j 2>/dev/null | python3 -c "import json,sys; [print(m['name']) for m in json.load(sys.stdin)]" 2>/dev/null); do
-                awww img -o "$_out" "${esc(path)}" >/dev/null 2>&1 &
-            done; wait
-        `;
-        Quickshell.execDetached(["bash", "-c", script]);
+        var thumb = (thumbPath && thumbPath !== "") ? thumbPath : path;
+        var safeThumb = thumb.replace(/'/g, "'\\''");
+        var safePath  = path.replace(/'/g, "'\\''");
+        Quickshell.execDetached(["bash", "-c",
+            "python3 '" + Quickshell.shellDir + "/scripts/generate_theme.py'" +
+            " --image '" + safeThumb + "' --auto --live 2>/dev/null & " +
+            "awww img --transition-type fade --transition-duration 1.5 '" + safePath + "' >/dev/null 2>&1 & " +
+            "cp '" + safePath + "' /tmp/qs_current_wallpaper.png 2>/dev/null & " +
+            "wait"
+        ]);
     }
 
     onVisibleChanged: {

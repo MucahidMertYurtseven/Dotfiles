@@ -6,3 +6,4 @@ singleton NetworkService 1.0 NetworkService.qml
 singleton PowerService 1.0 PowerService.qml
 singleton SystemService 1.0 SystemService.qml
 singleton AppState 1.0 AppState.qml
+singleton WeatherService 1.0 WeatherService.qml

@@ -9,6 +9,7 @@ QtObject {
     property string activePopup: ""          // hangi popup açık
     property bool dndEnabled: false          // rahatsız etmeyin
     property bool hasNotifs: false           // okunmamış bildirim var mı
+    property bool citySearchOpen: false      // şehir arama menüsü açık mı
 
     // OSD durumu
     property string osdType: ""      // "volume" | "brightness" | "layout"

@@ -23,7 +23,7 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("touch /tmp/quickshell-launcher"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("touch /tmp/quickshell-wallpaper"))
-hl.bind("CTRL + ALT + P", hl.dsp.exec_cmd(" quickshell -c /home/mert/.config/quickshell/HyprQuickFrame/ -n"))
+hl.bind("CTRL + ALT + P", hl.dsp.exec_cmd("PATH=$HOME/.local/bin:$PATH quickshell -c $HOME/.config/quickshell/HyprQuickFrame/ -n"))
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("sh -c 'cliphist list | wofi --dmenu --show dmenu -p \"Pano: \" | cliphist decode | wl-copy'"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("/home/mert/.config/quickshell/lockscreen/lock.sh"))
 -- ==========================================

@@ -73,7 +73,7 @@ Item {
     // Kombine timer: oynatıcı bul + pozisyon takibi (direkt D-Bus)
     Timer {
         interval: 250
-        running: true
+        running: root.visible
         repeat: true
         triggeredOnStart: true
         onTriggered: {
