@@ -87,7 +87,7 @@ Rectangle {
 			}
 			renderType: Text.NativeRendering
 			font.pointSize: 72; font.family: fontFamily
-			font.bold: true; color: brightColor
+			font.bold: true; color: accentColor
 			Timer {
 				running: true; repeat: true; interval: 1000
 				onTriggered: clock.date = new Date()
