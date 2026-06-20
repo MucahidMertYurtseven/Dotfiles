@@ -20,9 +20,9 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#b231112d"
+        color: theme ? theme.bgPopupBlur : "#b2143630"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#6675376d"
+        border.color: theme ? theme.border : "#6637756a"
         border.width: 1
         clip: true
     }
@@ -111,7 +111,7 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 32
             radius: 6
-            color: theme ? theme.hover : "#b653a8"
+            color: theme ? theme.hover : "#53b6a4"
 
             TextInput {
                 id: searchField
@@ -126,7 +126,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     x: 0
                     text: "Uygulama ara..."
-                    color: theme ? theme.textMuted : "#bc7fb4"
+                    color: theme ? theme.textMuted : "#7fbcb1"
                     font: parent.font
                     visible: parent.text === ""
                 }
@@ -154,7 +154,7 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#6675376d"
+            color: theme ? theme.border : "#6637756a"
             opacity: 0.6
         }
 
@@ -177,8 +177,8 @@ Item {
                 implicitHeight: 38
                 radius: 6
                 color: {
-                    if (index === root._selectedIndex) return theme ? theme.hover : "#b653a8"
-                    if (ma.containsMouse) return theme ? theme.hover : "#b653a8"
+                    if (index === root._selectedIndex) return theme ? theme.hover : "#53b6a4"
+                    if (ma.containsMouse) return theme ? theme.hover : "#53b6a4"
                     return "transparent"
                 }
 
@@ -216,7 +216,7 @@ Item {
 
                     Text {
                         text: "\u2699"
-                        color: theme ? theme.text : "#c6c2c5"
+                        color: theme ? theme.text : "#c2c6c5"
                         font.pixelSize: 18
                         visible: !iconImg.visible
                         Layout.preferredWidth: 28
@@ -227,7 +227,7 @@ Item {
                         text: modelData.name
                         color: index === root._selectedIndex
                             ? (theme ? theme.textBright : "#f7f7f7")
-                            : (theme ? theme.text : "#c6c2c5")
+                            : (theme ? theme.text : "#c2c6c5")
                         font.pixelSize: 12
                         font.family: theme ? theme.fontFamily : "monospace"
                         elide: Text.ElideRight
@@ -246,7 +246,7 @@ Item {
                             var favSet = {}
                             for (var fi = 0; fi < root._favorites.length; fi++)
                                 favSet[root._favorites[fi]] = true
-                            return favSet[modelData.file] ? (theme ? theme.warn : "#d09caa") : (theme ? theme.textMuted : "#bc7fb4")
+                            return favSet[modelData.file] ? (theme ? theme.warn : "#d09caa") : (theme ? theme.textMuted : "#7fbcb1")
                         }
                         font.pixelSize: 20
                         Layout.preferredWidth: 28
@@ -269,7 +269,7 @@ Item {
         Text {
             Layout.fillWidth: true
             text: root._filteredApps.length + " uygulama"
-            color: theme ? theme.textMuted : "#bc7fb4"
+            color: theme ? theme.textMuted : "#7fbcb1"
             font.pixelSize: 10
             font.family: theme ? theme.fontFamily : "monospace"
             horizontalAlignment: Text.AlignHCenter

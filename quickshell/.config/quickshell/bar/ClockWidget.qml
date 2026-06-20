@@ -45,9 +45,9 @@ Rectangle {
     height: 32
     clip: true
 
-    color: theme ? theme.bgBar : "#7f31112d"
+    color: theme ? theme.bgBar : "#7f143630"
     radius: 14
-    border.color: theme ? theme.border : "#6675376d"
+    border.color: theme ? theme.border : "#6637756a"
     border.width: 1
     Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
@@ -175,7 +175,7 @@ Rectangle {
                         width: parent.width / 64 - 1
                         height: _barHeights.length === 64 ? _barHeights[index] : 0
                         radius: width / 2
-                        color: theme ? theme.text : "#c6c2c5"
+                        color: theme ? theme.text : "#c2c6c5"
                         anchors.verticalCenter: parent.verticalCenter
                         Behavior on height {
                             NumberAnimation { duration: 30; easing.type: Easing.OutSine }
@@ -230,7 +230,7 @@ Rectangle {
                 x: root._marqueeX
                 anchors.verticalCenter: parent.verticalCenter
                 text: root._dispText
-                color: theme ? theme.text : "#c6c2c5"
+                color: theme ? theme.text : "#c2c6c5"
                 font.pixelSize: 12; font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -240,7 +240,7 @@ Rectangle {
                 x: marqueeText.x + marqueeText.width + 80
                 anchors.verticalCenter: parent.verticalCenter
                 text: root._dispText
-                color: theme ? theme.text : "#c6c2c5"
+                color: theme ? theme.text : "#c2c6c5"
                 font.pixelSize: 12; font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
                 visible: true

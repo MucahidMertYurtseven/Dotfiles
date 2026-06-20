@@ -25,9 +25,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#b231112d"
+        color: theme ? theme.bgPopupBlur : "#b2143630"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#6675376d"; border.width: 1
+        border.color: theme ? theme.border : "#6637756a"; border.width: 1
     }
 
     ColumnLayout {
@@ -42,7 +42,7 @@ Item {
             ColorizedIcon {
                 source: root._icon + root._batteryIcon()
                 iconSize: 26
-                iconColor: theme ? theme.text : "#c6c2c5"
+                iconColor: theme ? theme.text : "#c2c6c5"
             }
 
             ColumnLayout {
@@ -53,7 +53,7 @@ Item {
                     text: batteryPct + "%"
                     color: batteryPct < 20
                         ? (theme ? theme.warn : "#d09caa")
-                        : (theme ? theme.text : "#c6c2c5")
+                        : (theme ? theme.text : "#c2c6c5")
                     font.pixelSize: 22
                     font.bold: true
                     font.family: theme ? theme.fontFamily : "monospace"
@@ -61,7 +61,7 @@ Item {
 
                 Text {
                     text: root._timeText()
-                    color: theme ? theme.textMuted : "#bc7fb4"
+                    color: theme ? theme.textMuted : "#7fbcb1"
                     font.pixelSize: 9
                     font.family: theme ? theme.fontFamily : "monospace"
                     visible: text !== ""
@@ -80,14 +80,14 @@ Item {
         // Ayraç
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#6675376d"
+            color: theme ? theme.border : "#6637756a"
             opacity: 0.6
         }
 
         // Güç modu seçici başlık
         Text {
             text: "Güç Modu"
-            color: theme ? theme.textMuted : "#bc7fb4"
+            color: theme ? theme.textMuted : "#7fbcb1"
             font.pixelSize: 10
             font.family: theme ? theme.fontFamily : "monospace"
         }
@@ -109,15 +109,15 @@ Item {
                     implicitHeight: 32
                     radius: 6
                     color: modelData.key === root.mode
-                        ? (theme ? theme.active : "#dda6d5")
-                        : (ma.containsMouse ? (theme ? theme.hover : "#b653a8") : (theme ? theme.empty : "#793370"))
+                        ? (theme ? theme.active : "#a6ddd3")
+                        : (ma.containsMouse ? (theme ? theme.hover : "#53b6a4") : (theme ? theme.empty : "#33796d"))
                     Behavior on color { ColorAnimation { duration: 100 } }
 
                     ColorizedIcon {
                         anchors.centerIn: parent
                         source: root._icon + modelData.icon
                         iconSize: 18
-                        iconColor: modelData.key === root.mode ? "#000000" : (theme ? theme.text : "#c6c2c5")
+                        iconColor: modelData.key === root.mode ? "#000000" : (theme ? theme.text : "#c2c6c5")
                     }
 
                     property bool containsMouse: false
@@ -157,8 +157,8 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: modelData.label
                         color: modelData.key === root.mode
-                            ? (theme ? theme.text : "#c6c2c5")
-                            : (theme ? theme.textMuted : "#bc7fb4")
+                            ? (theme ? theme.text : "#c2c6c5")
+                            : (theme ? theme.textMuted : "#7fbcb1")
                         font.pixelSize: 9
                         font.family: theme ? theme.fontFamily : "monospace"
                         font.bold: modelData.key === root.mode
@@ -189,7 +189,7 @@ Item {
     // Şarj durumu rengi
     function _statusColor() {
         if (charging) return theme ? theme.green : "#78c293"
-        return theme ? theme.textMuted : "#bc7fb4"
+        return theme ? theme.textMuted : "#7fbcb1"
     }
 
     // Kalan süre metni

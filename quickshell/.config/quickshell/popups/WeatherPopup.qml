@@ -37,9 +37,9 @@ Item {
         id: popupItem
         width: 620
         implicitHeight: Math.min(650, mainLayout.implicitHeight + 0)
-        color: theme ? theme.bgPopupBlur : "#b231112d"
+        color: theme ? theme.bgPopupBlur : "#b2143630"
         radius: theme ? theme.popupRadius : 24
-        border.color: theme ? theme.border : "#6675376d"
+        border.color: theme ? theme.border : "#6637756a"
         border.width: 1
         clip: true
 

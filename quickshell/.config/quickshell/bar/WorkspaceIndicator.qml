@@ -14,9 +14,9 @@ Rectangle {
     height: 32
     width: wsRow.width + 24
     Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-    color: theme ? theme.bgBar : "#7f31112d"
+    color: theme ? theme.bgBar : "#7f143630"
     radius: 14
-    border.color: theme ? theme.border : "#6675376d"
+    border.color: theme ? theme.border : "#6637756a"
     border.width: 1
     Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
@@ -39,8 +39,8 @@ Rectangle {
                 height: 10
                 radius: 5
                 color: isActive
-                    ? (theme ? theme.active : "#a6badd")
-                    : (isOccupied ? (theme ? theme.hover : "#5376b6") : (theme ? theme.empty : "#334c79"))
+                    ? (theme ? theme.active : "#a6ddd3")
+                    : (isOccupied ? (theme ? theme.hover : "#53b6a4") : (theme ? theme.empty : "#33796d"))
 
                 
                 Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }

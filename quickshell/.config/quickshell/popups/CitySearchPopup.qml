@@ -17,9 +17,9 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#b231112d"
+        color: theme ? theme.bgPopupBlur : "#b2143630"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#6675376d"
+        border.color: theme ? theme.border : "#6637756a"
         border.width: 1
         clip: true
     }
@@ -104,8 +104,8 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 36
             radius: 8
-            color: theme ? theme.hover : "#b653a8"
-            border.color: searchField.activeFocus ? (theme ? theme.active : "#ffffff") : "transparent"
+            color: theme ? theme.hover : "#53b6a4"
+            border.color: searchField.activeFocus ? (theme ? theme.active : "#a6ddd3") : "transparent"
             border.width: 1
 
             RowLayout {
@@ -117,7 +117,7 @@ Item {
                     text: "search"
                     font.family: "Material Symbols Outlined"
                     font.pixelSize: 18
-                    color: theme ? theme.textMuted : "#bc7fb4"
+                    color: theme ? theme.textMuted : "#7fbcb1"
                 }
 
                 TextInput {
@@ -133,7 +133,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         x: 0
                         text: "Şehir ara veya yazın..."
-                        color: theme ? theme.textMuted : "#bc7fb4"
+                        color: theme ? theme.textMuted : "#7fbcb1"
                         font: parent.font
                         visible: parent.text === ""
                     }
@@ -161,7 +161,7 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#6675376d"
+            color: theme ? theme.border : "#6637756a"
             opacity: 0.6
         }
 
@@ -184,8 +184,8 @@ Item {
                 implicitHeight: 38
                 radius: 8
                 color: {
-                    if (index === root._selectedIndex) return theme ? theme.hover : "#b653a8"
-                    if (ma.containsMouse) return theme ? theme.hover : "#b653a8"
+                    if (index === root._selectedIndex) return theme ? theme.hover : "#53b6a4"
+                    if (ma.containsMouse) return theme ? theme.hover : "#53b6a4"
                     return "transparent"
                 }
 
@@ -212,8 +212,8 @@ Item {
                         text: "location_on"
                         font.family: "Material Symbols Outlined"
                         color: index === root._selectedIndex
-                            ? (theme ? theme.active : "#f7f7f7")
-                            : (theme ? theme.textMuted : "#c6c2c5")
+                            ? (theme ? theme.active : "#a6ddd3")
+                            : (theme ? theme.textMuted : "#7fbcb1")
                         font.pixelSize: 18
                         Layout.alignment: Qt.AlignVCenter
                     }
@@ -222,7 +222,7 @@ Item {
                         text: modelData
                         color: index === root._selectedIndex
                             ? (theme ? theme.textBright : "#f7f7f7")
-                            : (theme ? theme.text : "#c6c2c5")
+                            : (theme ? theme.text : "#c2c6c5")
                         font.pixelSize: 14
                         font.family: "Inter"
                         elide: Text.ElideRight
@@ -236,7 +236,7 @@ Item {
         Text {
             Layout.fillWidth: true
             text: root._filteredCities.length + " sonuç"
-            color: theme ? theme.textMuted : "#bc7fb4"
+            color: theme ? theme.textMuted : "#7fbcb1"
             font.pixelSize: 11
             font.family: "Inter"
             horizontalAlignment: Text.AlignHCenter

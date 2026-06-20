@@ -45,9 +45,9 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgBar : "#7f31112d"
+        color: theme ? theme.bgBar : "#7f143630"
         radius: 14
-        border.color: theme ? theme.border : "#6675376d"
+        border.color: theme ? theme.border : "#6637756a"
         border.width: 1
         Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
@@ -76,13 +76,13 @@ Item {
                             return root._icon + "battery-android-frame-2.svg"
                         }
                         iconSize: 20
-                        iconColor: root._batPct <= 10 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#dda6d5")
+                        iconColor: root._batPct <= 10 ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#a6ddd3")
                     }
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: root._batPct + "%"
-                        color: theme ? theme.text : "#c6c2c5"
+                        color: theme ? theme.text : "#c2c6c5"
                         font.pixelSize: 14
                         font.family: theme ? theme.fontFamily : "monospace"
                         font.bold: true
@@ -97,7 +97,7 @@ Item {
 
             // Ayraç
             Item { width: 8; height: 32
-                Rectangle { anchors.centerIn: parent; width: 1; height: 18; color: theme ? theme.border : "#6675376d"; opacity: 0.5 }
+                Rectangle { anchors.centerIn: parent; width: 1; height: 18; color: theme ? theme.border : "#6637756a"; opacity: 0.5 }
             }
 
             // Parlaklık
@@ -113,7 +113,7 @@ Item {
                             : "brightness-empty-symbolic.svg")
                     }
                     iconSize: 18
-                    iconColor: theme ? theme.active : "#dda6d5"
+                    iconColor: theme ? theme.active : "#a6ddd3"
                 }
                 MouseArea {
                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
@@ -129,7 +129,7 @@ Item {
 
             // Ayraç
             Item { width: 8; height: 32
-                Rectangle { anchors.centerIn: parent; width: 1; height: 18; color: theme ? theme.border : "#6675376d"; opacity: 0.5 }
+                Rectangle { anchors.centerIn: parent; width: 1; height: 18; color: theme ? theme.border : "#6637756a"; opacity: 0.5 }
             }
 
             // Ses
@@ -142,7 +142,7 @@ Item {
                             : (AudioService.volume >= 0.50 ? root._icon + "audio-volume-high-symbolic.svg"
                                 : root._icon + "audio-volume-medium-symbolic.svg"))
                     iconSize: 20
-                    iconColor: AudioService.muted ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#dda6d5")
+                    iconColor: AudioService.muted ? (theme ? theme.warn : "#d09caa") : (theme ? theme.active : "#a6ddd3")
                 }
                 MouseArea {
                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true

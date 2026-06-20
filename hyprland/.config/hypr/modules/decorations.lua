@@ -1,3 +1,20 @@
+local function get_active_border()
+    local default_color = "rgba(176,166,221,1.0)"
+    local f = io.open("/tmp/qs_theme.json", "r")
+    if not f then return default_color end
+    local content = f:read("*all")
+    f:close()
+    
+    local active_hex = content:match('"active"%s*:%s*"#([0-9a-fA-F]+)"')
+    if active_hex and #active_hex == 6 then
+        local r = tonumber(active_hex:sub(1, 2), 16)
+        local g = tonumber(active_hex:sub(3, 4), 16)
+        local b = tonumber(active_hex:sub(5, 6), 16)
+        return string.format("rgba(%d,%d,%d,1.0)", r, g, b)
+    end
+    return default_color
+end
+
 hl.config({
 
     xwayland = {
@@ -8,11 +25,11 @@ hl.config({
         gaps_in = 2,
         gaps_out = 2,
 
-        border_size = 1,
+        border_size = 2,
         
         col = {
-            active_border = "rgba(176,166,221,1.0)",
-            inactive_border = "rgba(64,51,121,1.0)"
+            active_border = get_active_border(),
+            inactive_border = "rgba(0,0,0,0)"
         }
     },
 

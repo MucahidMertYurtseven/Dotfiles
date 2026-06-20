@@ -292,7 +292,7 @@ Item {
         var safePath  = path.replace(/'/g, "'\\''");
         Quickshell.execDetached(["bash", "-c",
             "python3 '" + Quickshell.shellDir + "/scripts/generate_theme.py'" +
-            " --image '" + safeThumb + "' --auto --live 2>/dev/null & " +
+            " --image '" + safePath + "' --auto --live 2>/dev/null & " +
             "awww img --transition-type fade --transition-duration 1.5 '" + safePath + "' >/dev/null 2>&1 & " +
             "cp '" + safePath + "' /tmp/qs_current_wallpaper.png 2>/dev/null & " +
             "wait"

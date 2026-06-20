@@ -23,9 +23,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#b231112d"
+        color: theme ? theme.bgPopupBlur : "#b2143630"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#6675376d"; border.width: 1
+        border.color: theme ? theme.border : "#6637756a"; border.width: 1
     }
 
     ColumnLayout {
@@ -35,7 +35,7 @@ Item {
         // Ses cihaz adı
         Text {
             text: Pipewire.defaultAudioSink?.description ?? Pipewire.defaultAudioSink?.name ?? "Ses"
-            color: theme ? theme.textMuted : "#bc7fb4"
+            color: theme ? theme.textMuted : "#7fbcb1"
             font.pixelSize: 10
             font.family: theme ? theme.fontFamily : "monospace"
             Layout.fillWidth: true
@@ -55,12 +55,12 @@ Item {
                     return root._icon + "audio-volume-medium-symbolic.svg"
                 }
                 iconSize: 28
-                iconColor: root.muted ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c6c2c5")
+                iconColor: root.muted ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c2c6c5")
             }
 
             Text {
                 text: root.muted ? "Sessiz" : Math.round(root.vol * 100) + "%"
-                color: theme ? theme.text : "#c6c2c5"
+                color: theme ? theme.text : "#c2c6c5"
                 font.pixelSize: 16
                 font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
@@ -70,14 +70,14 @@ Item {
             // Mute toggle düğmesi
             Rectangle {
                 width: 40; height: 30; radius: 6
-                color: root.muted ? (theme ? theme.hover : "#b653a8") : (theme ? theme.empty : "#793370")
-                border.color: theme ? theme.border : "#6675376d"
+                color: root.muted ? (theme ? theme.hover : "#53b6a4") : (theme ? theme.empty : "#33796d")
+                border.color: theme ? theme.border : "#6637756a"
                 border.width: 1
                 ColorizedIcon {
                     anchors.centerIn: parent
                     source: root.muted ? root._icon + "audio-volume-muted-symbolic.svg" : root._icon + "audio-volume-high-symbolic.svg"
                     iconSize: 16
-                    iconColor: root.muted ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c6c2c5")
+                    iconColor: root.muted ? (theme ? theme.warn : "#d09caa") : (theme ? theme.text : "#c2c6c5")
                 }
                 MouseArea {
                     anchors.fill: parent
@@ -93,7 +93,7 @@ Item {
         // Ayraç
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#6675376d"
+            color: theme ? theme.border : "#6637756a"
             opacity: 0.6
         }
 
@@ -126,7 +126,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 height: 8
                 radius: height / 2
-                color: theme ? theme.border : "#6675376d"
+                color: theme ? theme.border : "#6637756a"
 
                 transform: Scale { origin.y: 4; yScale: slider._scaleY }
 
@@ -137,7 +137,7 @@ Item {
                     anchors.bottom: parent.bottom
                     width: parent.width * slider._pos
                     radius: parent.radius
-                    color: theme ? theme.active : "#dda6d5"
+                    color: theme ? theme.active : "#a6ddd3"
 
                     // Parlaklık efekti
                     Rectangle {

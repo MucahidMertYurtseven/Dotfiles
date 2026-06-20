@@ -294,9 +294,9 @@ Item {
     // Glass background
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#b231112d"
+        color: theme ? theme.bgPopupBlur : "#b2143630"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#6675376d"
+        border.color: theme ? theme.border : "#6637756a"
         border.width: 1
     }
 
@@ -313,7 +313,7 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 radius: root._frameRadius
-                color: root.hasCover ? "transparent" : (theme ? theme.empty : "#793370")
+                color: root.hasCover ? "transparent" : (theme ? theme.empty : "#33796d")
             }
 
             // Inner image (fills frame, rounded via mask)
@@ -375,7 +375,7 @@ Item {
                 anchors.centerIn: parent
                 source: root._icons + "music-note-symbolic.svg"
                 iconSize: 64
-                iconColor: theme ? theme.text : "#c6c2c5"
+                iconColor: theme ? theme.text : "#c2c6c5"
                 visible: !root.hasCover
             }
         }
@@ -429,7 +429,7 @@ Item {
         Text {
             Layout.fillWidth: true
             text: root.trackArtist || "\u2014"
-            color: theme ? theme.textMuted : "#c6c2c5"
+            color: theme ? theme.textMuted : "#7fbcb1"
             font.pixelSize: 13
             font.family: theme ? theme.fontFamily : "monospace"
             elide: Text.ElideRight
@@ -450,7 +450,7 @@ Item {
                 anchors.verticalCenterOffset: -5
                 height: 8
                 radius: height / 2
-                color: theme ? theme.border : "#6675376d"
+                color: theme ? theme.border : "#6637756a"
 
                 transform: Scale { origin.y: 4; yScale: root._progressScaleY }
 
@@ -458,7 +458,7 @@ Item {
                     anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
                     width: parent.width * root.displayProgress
                     radius: parent.radius
-                    color: theme ? theme.active : "#dda6d5"
+                    color: theme ? theme.active : "#a6ddd3"
 
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -476,7 +476,7 @@ Item {
             Text {
                 anchors { left: parent.left; bottom: parent.bottom }
                 text: root.formatTime(root.displayPos)
-                color: theme ? theme.textMuted : "#c6c2c5"
+                color: theme ? theme.textMuted : "#7fbcb1"
                 font.pixelSize: 11
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -484,7 +484,7 @@ Item {
             Text {
                 anchors { right: parent.right; bottom: parent.bottom }
                 text: root.formatRemaining(root.displayPos)
-                color: theme ? theme.textMuted : "#c6c2c5"
+                color: theme ? theme.textMuted : "#7fbcb1"
                 font.pixelSize: 11
                 font.family: theme ? theme.fontFamily : "monospace"
             }
@@ -542,8 +542,8 @@ Item {
                     source: root._icons + "media-skip-backward-symbolic.svg"
                     iconSize: 22
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.active : "#dda6d5")
-                        : (theme ? theme.empty : "#793370")
+                        ? (theme ? theme.active : "#a6ddd3")
+                        : (theme ? theme.empty : "#33796d")
                 }
 
                 MouseArea {
@@ -569,8 +569,8 @@ Item {
                         : root._icons + "media-playback-start-symbolic.svg"
                     iconSize: 30
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.active : "#dda6d5")
-                        : (theme ? theme.empty : "#793370")
+                        ? (theme ? theme.active : "#a6ddd3")
+                        : (theme ? theme.empty : "#33796d")
                 }
 
                 MouseArea {
@@ -594,8 +594,8 @@ Item {
                     source: root._icons + "media-skip-forward-symbolic.svg"
                     iconSize: 22
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.active : "#dda6d5")
-                        : (theme ? theme.empty : "#793370")
+                        ? (theme ? theme.active : "#a6ddd3")
+                        : (theme ? theme.empty : "#33796d")
                 }
 
                 MouseArea {
@@ -623,7 +623,7 @@ Item {
                 iconSize: 16
                 iconColor: (Pipewire.defaultAudioSink?.audio?.muted ?? false)
                     ? (theme ? theme.warn : "#d09caa")
-                    : (theme ? theme.textMuted : "#c6c2c5")
+                    : (theme ? theme.textMuted : "#7fbcb1")
             }
 
             Item {
@@ -646,7 +646,7 @@ Item {
                     anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter }
                     height: 8
                     radius: height / 2
-                    color: theme ? theme.border : "#6675376d"
+                    color: theme ? theme.border : "#6637756a"
 
                     transform: Scale { origin.y: 4; yScale: root._volScaleY }
 
@@ -654,7 +654,7 @@ Item {
                         anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
                         width: parent.width * volSlider._pos
                         radius: parent.radius
-                        color: theme ? theme.active : "#dda6d5"
+                        color: theme ? theme.active : "#a6ddd3"
 
                         Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -699,7 +699,7 @@ Item {
                 iconSize: 16
                 iconColor: (Pipewire.defaultAudioSink?.audio?.muted ?? false)
                     ? (theme ? theme.warn : "#d09caa")
-                    : (theme ? theme.textMuted : "#c6c2c5")
+                    : (theme ? theme.textMuted : "#7fbcb1")
             }
         }
 

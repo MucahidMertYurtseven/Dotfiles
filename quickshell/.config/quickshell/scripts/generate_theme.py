@@ -462,6 +462,18 @@ def main():
         Path("/tmp/qs_theme.json").write_text(_json.dumps(palette))
         n = sync_inline_fallbacks(palette)
 
+    # Hyprland pencere çerçevelerini dinamik olarak güncelle
+    try:
+        active_color = palette.get("active", "#b0a6dd")
+        r, g, b = hex_to_rgb(active_color)
+        active_rgba = f"rgba({r},{g},{b},1.0)"
+        eval_cmd = f"hl.config({{ general = {{ col = {{ active_border = '{active_rgba}', inactive_border = 'rgba(0,0,0,0)' }} }} }})"
+        subprocess.run(["hyprctl", "eval", eval_cmd], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # Çerçeve renginin anında görselleşmesi için Hyprland'i reload et
+        subprocess.run(["hyprctl", "reload"], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
+
     if not auto:
         print(f"  → {THEME_FILE}")
         if n:

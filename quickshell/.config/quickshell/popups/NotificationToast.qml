@@ -78,8 +78,8 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: 12
-        color: theme ? theme.bgPopupBlur : "#b231112d"
-        border.color: theme ? theme.border : "#6675376d"; border.width: 1
+        color: theme ? theme.bgPopupBlur : "#b2143630"
+        border.color: theme ? theme.border : "#6637756a"; border.width: 1
     }
 
     // İçerik
@@ -92,8 +92,8 @@ Item {
         Rectangle {
             width: 3; height: parent.height; radius: 1.5
             color: urgency === 2 ? (theme ? theme.warn : "#d09caa")
-                 : urgency === 1 ? (theme ? theme.text : "#c6c2c5")
-                 : (theme ? theme.textMuted : "#bc7fb4")
+                 : urgency === 1 ? (theme ? theme.text : "#c2c6c5")
+                 : (theme ? theme.textMuted : "#7fbcb1")
         }
 
         // Başlık + mesaj
@@ -114,7 +114,7 @@ Item {
 
             Text {
                 text: root.body
-                color: theme ? theme.text : "#c6c2c5"
+                color: theme ? theme.text : "#c2c6c5"
                 font.pixelSize: 10
                 font.family: theme ? theme.fontFamily : "monospace"
                 elide: Text.ElideRight
@@ -132,7 +132,7 @@ Item {
             Rectangle {
                 width: 10; height: 2; radius: 1
                 anchors.centerIn: parent
-                color: theme ? theme.text : "#c6c2c5"
+                color: theme ? theme.text : "#c2c6c5"
             }
 
             MouseArea {

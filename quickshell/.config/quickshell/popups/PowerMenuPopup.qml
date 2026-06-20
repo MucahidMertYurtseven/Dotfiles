@@ -19,9 +19,9 @@ Item {
     // Popup arkaplanı
     Rectangle {
         anchors.fill: parent
-        color: theme ? theme.bgPopupBlur : "#b231112d"
+        color: theme ? theme.bgPopupBlur : "#b2143630"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#6675376d"; border.width: 1
+        border.color: theme ? theme.border : "#6637756a"; border.width: 1
     }
 
     readonly property string _icon: Quickshell.shellDir + "/bar/icons/"
@@ -38,12 +38,12 @@ Item {
             ColorizedIcon {
                 source: root._icon + "system-shutdown-symbolic.svg"
                 iconSize: 16
-                iconColor: theme ? theme.textMuted : "#bc7fb4"
+                iconColor: theme ? theme.textMuted : "#7fbcb1"
             }
 
             Text {
                 text: "Sistem"
-                color: theme ? theme.textMuted : "#bc7fb4"
+                color: theme ? theme.textMuted : "#7fbcb1"
                 font.pixelSize: 10
                 font.family: theme ? theme.fontFamily : "monospace"
                 font.bold: true
@@ -54,7 +54,7 @@ Item {
         // Ayraç
         Rectangle {
             Layout.fillWidth: true; height: 1
-            color: theme ? theme.border : "#6675376d"
+            color: theme ? theme.border : "#6637756a"
             opacity: 0.6
         }
 
@@ -72,7 +72,7 @@ Item {
                 Layout.fillWidth: true
                 implicitHeight: 40
                 radius: 6
-                color: ma.containsMouse ? (theme ? theme.hover : "#b653a8") : "transparent"
+                color: ma.containsMouse ? (theme ? theme.hover : "#53b6a4") : "transparent"
                 Behavior on color { ColorAnimation { duration: 100 } }
 
                 RowLayout {
@@ -83,13 +83,13 @@ Item {
                     ColorizedIcon {
                         source: root._icon + modelData.icon
                         iconSize: 20
-                        iconColor: theme ? theme.text : "#c6c2c5"
+                        iconColor: theme ? theme.text : "#c2c6c5"
                         Layout.alignment: Qt.AlignVCenter
                     }
 
                     Text {
                         text: modelData.label
-                        color: theme ? theme.text : "#c6c2c5"
+                        color: theme ? theme.text : "#c2c6c5"
                         font.pixelSize: 13
                         font.family: theme ? theme.fontFamily : "monospace"
                         font.bold: true
@@ -99,7 +99,7 @@ Item {
 
                     Text {
                         text: "›"
-                        color: theme ? theme.textMuted : "#bc7fb4"
+                        color: theme ? theme.textMuted : "#7fbcb1"
                         font.pixelSize: 18
                         font.family: theme ? theme.fontFamily : "monospace"
                         Layout.alignment: Qt.AlignVCenter
