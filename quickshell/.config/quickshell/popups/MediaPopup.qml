@@ -5,6 +5,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Services.Mpris
 import qs.components
@@ -24,8 +25,14 @@ Item {
     readonly property string trackTitle: hasPlayer ? player.trackTitle : ""
     readonly property string trackArtist: hasPlayer ? player.trackArtist : ""
     readonly property bool isPlaying: hasPlayer ? player.isPlaying : false
-    readonly property bool hasCover: hasPlayer && player.trackCoverUrl && player.trackCoverUrl.toString() !== ""
-    readonly property string coverUrl: hasCover ? player.trackCoverUrl : ""
+    readonly property string coverUrl: _coverUrl || ""
+    readonly property bool hasCover: coverUrl !== ""
+
+    // Cover URL: Quickshell Mpris API uses trackArtUrl
+    // (not trackCoverUrl). Also try playerctl as fallback for players
+    // that update art URL after initial metadata.
+    property string _coverUrl: ""
+
     readonly property real pos: _trackPosition
     readonly property real len: hasPlayer ? player.length : 0
     readonly property real progress: len > 0 ? pos / len : 0
@@ -35,7 +42,6 @@ Item {
     property bool _dragging: false
     property real _dragRatio: 0
 
-    // Progress bar hover scale
     property real _progressScaleY: seekArea.containsMouse || _dragging ? 1.0 : 0.75
     Behavior on _progressScaleY { NumberAnimation { duration: 250; easing.type: Easing.OutQuad } }
 
@@ -45,9 +51,25 @@ Item {
             volSlider.value = root.vol
     }
 
-    // Volume slider hover scale
     property real _volScaleY: volSlider._hovered || volSlider._dragging ? 1.0 : 0.75
     Behavior on _volScaleY { NumberAnimation { duration: 250; easing.type: Easing.OutQuad } }
+
+    // Fetch cover URL from Mpris player or fallback to playerctl
+    function updateCoverUrl() {
+        if (!hasPlayer) {
+            _coverUrl = ""
+            return
+        }
+        // Try native Quickshell Mpris property first
+        if (player.trackArtUrl && player.trackArtUrl !== "") {
+            _coverUrl = player.trackArtUrl
+            return
+        }
+        // Fallback: try playerctl for players that expose artUrl late
+        if (!_coverUrl || _coverUrl === "") {
+            coverProc.running = true
+        }
+    }
 
     function formatTime(s) {
         if (s <= 0) return "0:00"
@@ -102,6 +124,7 @@ Item {
         triggeredOnStart: true
         onTriggered: {
             findBestPlayer()
+            updateCoverUrl()
             if (player && !_dragging) {
                 var p = player.position
                 if (p >= 0) _trackPosition = p
@@ -112,7 +135,25 @@ Item {
     }
 
     onPlayerChanged: {
-        if (player) _trackPosition = player.position
+        if (player) {
+            _trackPosition = player.position
+            _coverUrl = ""
+        }
+    }
+
+    // playerctl fallback for cover URL
+    Process {
+        id: coverProc
+        command: ["sh", "-c", "playerctl metadata mpris:artUrl 2>/dev/null || true"]
+        running: false
+        stdout: SplitParser {
+            onRead: function(line) {
+                var url = line.trim()
+                if (url && url !== "") {
+                    _coverUrl = url
+                }
+            }
+        }
     }
 
     anchors.fill: parent
@@ -133,52 +174,40 @@ Item {
         // === SPACER TOP ===
         Item { Layout.preferredHeight: 10 }
 
-        // === ALBUM ARTWORK ===
-        Item {
-            Layout.alignment: Qt.AlignHCenter
+        // === ALBUM ARTWORK (left-aligned) ===
+        Rectangle {
             Layout.preferredWidth: 240
             Layout.preferredHeight: 240
+            radius: 12
+            clip: true
+            color: theme ? theme.empty : "#793370"
+            border.color: Qt.rgba(0, 0, 0, 0.2)
+            border.width: 1
 
-            Rectangle {
+            Image {
                 anchors.fill: parent
-                radius: 12
-                clip: true
-                color: theme ? theme.empty : "#793370"
-
-                Image {
-                    anchors.fill: parent
-                    source: root.coverUrl
-                    sourceSize { width: 480; height: 480 }
-                    fillMode: Image.PreserveAspectCrop
-                    smooth: true
-                    mipmap: true
-                    visible: root.hasCover
-                }
-
-                ColorizedIcon {
-                    anchors.centerIn: parent
-                    source: root._icons + "music-note-symbolic.svg"
-                    iconSize: 64
-                    iconColor: theme ? theme.text : "#c6c2c5"
-                    visible: !root.hasCover
-                }
+                source: root.coverUrl
+                sourceSize { width: 480; height: 480 }
+                fillMode: Image.PreserveAspectCrop
+                smooth: true
+                mipmap: true
+                visible: root.hasCover
             }
 
-            Rectangle {
-                anchors.fill: parent
-                radius: 12
-                color: "transparent"
-                border.color: Qt.rgba(0, 0, 0, 0.15)
-                border.width: 1
+            ColorizedIcon {
+                anchors.centerIn: parent
+                source: root._icons + "music-note-symbolic.svg"
+                iconSize: 64
+                iconColor: theme ? theme.text : "#c6c2c5"
+                visible: !root.hasCover
             }
         }
 
         Item { Layout.preferredHeight: 10 }
 
-        // === TRACK INFO ===
+        // === TRACK INFO (left-aligned with artwork) ===
         Text {
             Layout.fillWidth: true
-            Layout.leftMargin: 4
             text: root.trackTitle || "No Track"
             color: theme ? theme.textBright : "#f7f7f7"
             font.pixelSize: 17
@@ -190,7 +219,6 @@ Item {
 
         Text {
             Layout.fillWidth: true
-            Layout.leftMargin: 4
             text: root.trackArtist || "\u2014"
             color: theme ? theme.textMuted : "#c6c2c5"
             font.pixelSize: 13
@@ -207,7 +235,6 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 36
 
-            // Slider
             Rectangle {
                 id: progressTrack
                 anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter }
@@ -237,7 +264,6 @@ Item {
                 }
             }
 
-            // Time labels
             Text {
                 anchors { left: parent.left; bottom: parent.bottom }
                 text: root.formatTime(root.displayPos)
@@ -254,7 +280,6 @@ Item {
                 font.family: theme ? theme.fontFamily : "monospace"
             }
 
-            // Seek interaction
             MouseArea {
                 id: seekArea
                 anchors { fill: parent; topMargin: -4; bottomMargin: -4 }
@@ -297,7 +322,6 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             spacing: 14
 
-            // Previous
             Item {
                 width: 28; height: 28
                 property real _s: prevMa.containsMouse ? 1.15 : 1.0
@@ -323,7 +347,6 @@ Item {
                 }
             }
 
-            // Play/Pause
             Item {
                 width: 36; height: 36
                 property real _s: playMa.containsMouse ? 1.12 : 1.0
@@ -351,7 +374,6 @@ Item {
                 }
             }
 
-            // Next
             Item {
                 width: 28; height: 28
                 property real _s: nextMa.containsMouse ? 1.15 : 1.0
