@@ -22,9 +22,7 @@ Item {
 
     readonly property bool hasPlayer: player !== null
     readonly property string trackTitle: hasPlayer ? player.trackTitle : ""
-    readonly property string trackArtist: hasPlayer
-        ? (player.trackArtists ? player.trackArtists.join(", ") : (player.trackArtist || ""))
-        : ""
+    readonly property string trackArtist: hasPlayer ? player.trackArtist : ""
     readonly property bool isPlaying: hasPlayer ? player.isPlaying : false
     readonly property bool hasCover: hasPlayer && player.trackCoverUrl && player.trackCoverUrl.toString() !== ""
     readonly property string coverUrl: hasCover ? player.trackCoverUrl : ""
@@ -37,11 +35,19 @@ Item {
     property bool _dragging: false
     property real _dragRatio: 0
 
+    // Progress bar hover scale
+    property real _progressScaleY: seekArea.containsMouse || _dragging ? 1.0 : 0.75
+    Behavior on _progressScaleY { NumberAnimation { duration: 250; easing.type: Easing.OutQuad } }
+
     property real vol: Pipewire.defaultAudioSink?.audio?.volume ?? 0
     onVolChanged: {
         if (!volSlider._dragging)
             volSlider.value = root.vol
     }
+
+    // Volume slider hover scale
+    property real _volScaleY: volSlider._hovered || volSlider._dragging ? 1.0 : 0.75
+    Behavior on _volScaleY { NumberAnimation { duration: 250; easing.type: Easing.OutQuad } }
 
     function formatTime(s) {
         if (s <= 0) return "0:00"
@@ -121,8 +127,11 @@ Item {
     }
 
     ColumnLayout {
-        anchors { fill: parent; margins: 16 }
+        anchors { fill: parent; margins: theme?.popupPad ?? 12 }
         spacing: 0
+
+        // === SPACER TOP ===
+        Item { Layout.preferredHeight: 10 }
 
         // === ALBUM ARTWORK ===
         Item {
@@ -164,11 +173,12 @@ Item {
             }
         }
 
-        Item { Layout.preferredHeight: 12 }
+        Item { Layout.preferredHeight: 10 }
 
         // === TRACK INFO ===
         Text {
             Layout.fillWidth: true
+            Layout.leftMargin: 4
             text: root.trackTitle || "No Track"
             color: theme ? theme.textBright : "#f7f7f7"
             font.pixelSize: 17
@@ -180,6 +190,7 @@ Item {
 
         Text {
             Layout.fillWidth: true
+            Layout.leftMargin: 4
             text: root.trackArtist || "\u2014"
             color: theme ? theme.textMuted : "#c6c2c5"
             font.pixelSize: 13
@@ -189,39 +200,44 @@ Item {
             Layout.topMargin: 2
         }
 
-        Item { Layout.preferredHeight: 10 }
+        Item { Layout.preferredHeight: 8 }
 
         // === PROGRESS BAR ===
         Item {
             Layout.fillWidth: true
-            Layout.preferredHeight: 28
+            Layout.preferredHeight: 36
 
+            // Slider
             Rectangle {
                 id: progressTrack
                 anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter }
                 anchors.verticalCenterOffset: -5
-                height: 4
-                radius: 2
+                height: 8
+                radius: height / 2
                 color: theme ? theme.border : "#6675376d"
+
+                transform: Scale { origin.y: 4; yScale: root._progressScaleY }
 
                 Rectangle {
                     anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
                     width: parent.width * root.displayProgress
-                    radius: 2
+                    radius: parent.radius
                     color: theme ? theme.active : "#dda6d5"
 
                     Rectangle {
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 10
-                        height: 10
-                        radius: 5
-                        color: theme ? theme.active : "#dda6d5"
-                        visible: (seekArea.containsMouse || root._dragging) && root.hasPlayer && root.len > 0
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: parent.top
+                        anchors.topMargin: 1
+                        width: parent.width * 0.8
+                        height: parent.height * 0.3
+                        radius: height / 2
+                        color: Qt.rgba(1, 1, 1, 0.15)
+                        visible: parent.width > 2
                     }
                 }
             }
 
+            // Time labels
             Text {
                 anchors { left: parent.left; bottom: parent.bottom }
                 text: root.formatTime(root.displayPos)
@@ -238,6 +254,7 @@ Item {
                 font.family: theme ? theme.fontFamily : "monospace"
             }
 
+            // Seek interaction
             MouseArea {
                 id: seekArea
                 anchors { fill: parent; topMargin: -4; bottomMargin: -4 }
@@ -272,32 +289,33 @@ Item {
             }
         }
 
-        Item { Layout.preferredHeight: 10 }
+        Item { Layout.preferredHeight: 8 }
 
         // === NAVIGATION CONTROLS ===
         RowLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            spacing: 32
+            spacing: 14
 
+            // Previous
             Item {
-                width: 32; height: 32
-                property real _s: prevMa.containsMouse ? 1.1 : 1.0
+                width: 28; height: 28
+                property real _s: prevMa.containsMouse ? 1.15 : 1.0
                 scale: _s
                 Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
 
                 ColorizedIcon {
                     anchors.centerIn: parent
                     source: root._icons + "media-skip-backward-symbolic.svg"
-                    iconSize: 24
+                    iconSize: 22
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.text : "#c6c2c5")
+                        ? (theme ? theme.active : "#dda6d5")
                         : (theme ? theme.empty : "#793370")
                 }
 
                 MouseArea {
                     id: prevMa
-                    anchors.fill: parent; anchors.margins: -8
+                    anchors.fill: parent; anchors.margins: -4
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     enabled: root.hasPlayer
@@ -305,25 +323,22 @@ Item {
                 }
             }
 
+            // Play/Pause
             Item {
-                width: 48; height: 48
-                property real _s: playMa.containsMouse ? 1.08 : 1.0
+                width: 36; height: 36
+                property real _s: playMa.containsMouse ? 1.12 : 1.0
                 scale: _s
                 Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
-
-                Rectangle {
-                    anchors.fill: parent
-                    radius: 24
-                    color: "#ffffff"
-                }
 
                 ColorizedIcon {
                     anchors.centerIn: parent
                     source: root.isPlaying
                         ? root._icons + "media-playback-pause-symbolic.svg"
                         : root._icons + "media-playback-start-symbolic.svg"
-                    iconSize: 28
-                    iconColor: theme ? theme.bgDark : "#252627"
+                    iconSize: 30
+                    iconColor: root.hasPlayer
+                        ? (theme ? theme.active : "#dda6d5")
+                        : (theme ? theme.empty : "#793370")
                 }
 
                 MouseArea {
@@ -336,24 +351,25 @@ Item {
                 }
             }
 
+            // Next
             Item {
-                width: 32; height: 32
-                property real _s: nextMa.containsMouse ? 1.1 : 1.0
+                width: 28; height: 28
+                property real _s: nextMa.containsMouse ? 1.15 : 1.0
                 scale: _s
                 Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
 
                 ColorizedIcon {
                     anchors.centerIn: parent
                     source: root._icons + "media-skip-forward-symbolic.svg"
-                    iconSize: 24
+                    iconSize: 22
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.text : "#c6c2c5")
+                        ? (theme ? theme.active : "#dda6d5")
                         : (theme ? theme.empty : "#793370")
                 }
 
                 MouseArea {
                     id: nextMa
-                    anchors.fill: parent; anchors.margins: -8
+                    anchors.fill: parent; anchors.margins: -4
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     enabled: root.hasPlayer
@@ -362,12 +378,12 @@ Item {
             }
         }
 
-        Item { Layout.preferredHeight: 14 }
+        Item { Layout.preferredHeight: 10 }
 
         // === VOLUME CONTROLS ===
         RowLayout {
             Layout.fillWidth: true
-            spacing: 10
+            spacing: 8
 
             ColorizedIcon {
                 source: (Pipewire.defaultAudioSink?.audio?.muted ?? false)
@@ -382,11 +398,12 @@ Item {
             Item {
                 id: volSlider
                 Layout.fillWidth: true
-                Layout.preferredHeight: 20
+                Layout.preferredHeight: 28
 
                 property real value: root.vol
                 readonly property real _pos: Math.min(value, 1.0)
                 property bool _dragging: false
+                property bool _hovered: false
 
                 onValueChanged: {
                     if (_dragging) {
@@ -397,15 +414,28 @@ Item {
 
                 Rectangle {
                     anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter }
-                    height: 4
-                    radius: 2
+                    height: 8
+                    radius: height / 2
                     color: theme ? theme.border : "#6675376d"
+
+                    transform: Scale { origin.y: 4; yScale: root._volScaleY }
 
                     Rectangle {
                         anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
                         width: parent.width * volSlider._pos
-                        radius: 2
+                        radius: parent.radius
                         color: theme ? theme.active : "#dda6d5"
+
+                        Rectangle {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.top: parent.top
+                            anchors.topMargin: 1
+                            width: parent.width * 0.8
+                            height: parent.height * 0.3
+                            radius: height / 2
+                            color: Qt.rgba(1, 1, 1, 0.15)
+                            visible: parent.width > 2
+                        }
                     }
                 }
 
@@ -413,6 +443,9 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
+
+                    onEntered: volSlider._hovered = true
+                    onExited: volSlider._hovered = false
 
                     onPressed: (mouse) => {
                         volSlider._dragging = true
@@ -439,5 +472,8 @@ Item {
                     : (theme ? theme.textMuted : "#c6c2c5")
             }
         }
+
+        // === SPACER BOTTOM ===
+        Item { Layout.preferredHeight: 10 }
     }
 }

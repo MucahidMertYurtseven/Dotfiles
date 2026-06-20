@@ -220,7 +220,7 @@ ShellRoot {
             case "brightness": return 320
             case "battery": return 320
             case "power": return 320
-            case "media": return 320
+            case "media": return 300
             case "weather": return 620
             case "launcher": return 400
             case "wallpaper": return Screen.width * 0.60
@@ -239,7 +239,7 @@ ShellRoot {
             case "brightness": return 160
             case "battery": return 190
             case "power": return 225
-            case "media": return 440
+            case "media": return 450
             case "weather": return 525
             case "launcher": return 450
             case "wallpaper": return Screen.height * 0.50
