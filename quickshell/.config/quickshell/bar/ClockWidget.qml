@@ -61,11 +61,32 @@ Rectangle {
     // Sayıları iki basamaklı yap (ör: 09)
     function pad(n) { return n < 10 ? "0" + n : n }
 
-    // En uygun MPRIS oynatıcıyı bul (Playing > Paused)
+    // En uygun MPRIS oynatıcıyı bul
     function findBestPlayer() {
+        var arr = Mpris.players.values
+
+        // Mevcut player varsa ve başka biri actively Playing değilse onu tut
+        if (player) {
+            var found = false
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] === player) { found = true; break }
+            }
+            if (found) {
+                if (player.playbackState !== MprisPlaybackState.Playing) {
+                    for (var i = 0; i < arr.length; i++) {
+                        if (arr[i] !== player && arr[i].playbackState === MprisPlaybackState.Playing) {
+                            player = arr[i]
+                            return
+                        }
+                    }
+                }
+                return
+            }
+        }
+
+        // Mevcut player yok/gitti, en iyisini bul
         var best = null
         var bestPri = -1
-        var arr = Mpris.players.values
         for (var i = 0; i < arr.length; i++) {
             var p = arr[i]
             var pri = 0
@@ -83,7 +104,7 @@ Rectangle {
         // Herhangi bir player var mı?
         var hasPlayer = best !== null
 
-        // Player geldi/gitti → otomatik aç/kapat, scroll override sıfırlanır
+        // Player geldi/gitti → otomatik aç/kapat
         if (hasPlayer !== _prevHasPlayer) {
             _prevHasPlayer = hasPlayer
             _showMedia = hasPlayer
@@ -176,7 +197,7 @@ Rectangle {
             anchors.fill: parent
             source: visSource
             maskSource: visMask
-            opacity: 0.15
+            opacity: 0.25
         }
 
         // Kayan yazı (marquee)
@@ -186,8 +207,23 @@ Rectangle {
             anchors.left: parent.left; anchors.leftMargin: 8
             anchors.right: parent.right; anchors.rightMargin: 8
             height: 16
-            clip: true
+            clip: false
             visible: _dispText !== ""
+            layer.enabled: true
+            layer.effect: OpacityMask {
+                maskSource: LinearGradient {
+                    width: marqueeHost.width
+                    height: marqueeHost.height
+                    start: Qt.point(0, 0)
+                    end: Qt.point(marqueeHost.width, 0)
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "transparent" }
+                        GradientStop { position: 0.10; color: "white" }
+                        GradientStop { position: 0.90; color: "white" }
+                        GradientStop { position: 1.0; color: "transparent" }
+                    }
+                }
+            }
 
             Text {
                 id: marqueeText
@@ -207,7 +243,7 @@ Rectangle {
                 color: theme ? theme.text : "#c6c2c5"
                 font.pixelSize: 12; font.bold: true
                 font.family: theme ? theme.fontFamily : "monospace"
-                visible: marqueeText.width > 0
+                visible: true
             }
 
             // Kayan yazı timer'ı
@@ -217,9 +253,9 @@ Rectangle {
                 running: root._showMedia && root._dispText !== ""
                 repeat: true
                 onTriggered: {
-                    root._marqueeX -= 1
+                    root._marqueeX = root._marqueeX - 1
                     if (root._marqueeX + marqueeText.width < 0) {
-                        root._marqueeX += marqueeText.width + 80
+                        root._marqueeX = root._marqueeX + marqueeText.width + 80
                     }
                 }
             }
