@@ -83,7 +83,11 @@ Item {
         // MPRIS doğrudan artUrl veriyorsa onu kullan (Spotify, local player vb.)
         // Ama eğer zaten bir YouTube URL'imiz varsa buna geçme
         if (player.trackArtUrl && player.trackArtUrl !== "" && _ytVideoId === "") {
-            _coverUrl = player.trackArtUrl
+            var artUrl = player.trackArtUrl
+            if (artUrl.indexOf("googleusercontent.com") >= 0 || artUrl.indexOf("ggpht.com") >= 0) {
+                artUrl = artUrl.replace(/=w\d+-h\d+/, "=w480-h480")
+            }
+            _coverUrl = artUrl
             _coverTrackTitle = currentTitle
             return
         }
@@ -209,6 +213,9 @@ Item {
             onRead: function(line) {
                 var url = line.trim()
                 if (url && url !== "") {
+                    if (url.indexOf("googleusercontent.com") >= 0 || url.indexOf("ggpht.com") >= 0) {
+                        url = url.replace(/=w\d+-h\d+/, "=w480-h480")
+                    }
                     _coverUrl = url
                 }
             }
@@ -257,7 +264,6 @@ Item {
                     }
                     if (vid) {
                         root._ytVideoId = vid
-                        // En yüksek kaliteden başla
                         root._coverUrl = "https://i.ytimg.com/vi/" + vid + "/maxresdefault.jpg"
                     }
                 }

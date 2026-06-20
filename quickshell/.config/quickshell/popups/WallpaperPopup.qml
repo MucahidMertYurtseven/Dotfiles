@@ -3,6 +3,7 @@ import QtQuick.Window
 import Quickshell
 import Quickshell.Io
 import qs.services
+import Qt5Compat.GraphicalEffects
 
 Item {
     id: root
@@ -133,8 +134,9 @@ Item {
             currentIndex: -1
             focus: true
             keyNavigationWraps: true
-            cellWidth: (grid.width - 12 * 4) / 5
-            cellHeight: cellWidth * 0.7
+            // 4 Sütunlu tam simetrik düzen
+            cellWidth: Math.floor(grid.width / 4)
+            cellHeight: cellWidth * 9 / 16
             clip: true
             boundsBehavior: Flickable.StopAtBounds
             visible: !loading && wallpaperModel.count > 0
@@ -142,28 +144,44 @@ Item {
             delegate: Item {
                 width: grid.cellWidth; height: grid.cellHeight
 
+                // Dış çerçeve (Seçili/hover durumunda görünür)
                 Rectangle {
-                    anchors.fill: parent; anchors.margins: 6
-                    radius: 8
-                    color: root.bgColor
-                    layer.enabled: true
-                    layer.smooth: true
+                    anchors.fill: parent; anchors.margins: 4
+                    radius: 10
+                    color: "transparent"
+                    border.color: root.textColor
+                    border.width: 2
+                    opacity: grid.currentIndex === index ? 1.0 : (ma.containsMouse ? 0.5 : 0.0)
+                    Behavior on opacity { NumberAnimation { duration: 120 } }
+                }
 
-                    Image {
-                        anchors.fill: parent; fillMode: Image.PreserveAspectCrop
-                        source: model.thumb
-                        sourceSize.width: 200
+                // İç resim alanı (Dış çerçevenin içinde, tam 16:9, köşeleri yuvarlak)
+                Item {
+                    id: imgWrap
+                    anchors.fill: parent
+                    anchors.margins: 8
+
+                    layer.enabled: true
+                    layer.effect: OpacityMask {
+                        maskSource: Rectangle {
+                            width: imgWrap.width; height: imgWrap.height
+                            radius: 6
+                            color: "#ffffff"
+                        }
                     }
 
-                    // Seçili/hover göstergesi
                     Rectangle {
                         anchors.fill: parent
-                        radius: 8
-                        color: "transparent"
-                        border.color: root.textColor
-                        border.width: 2
-                        opacity: grid.currentIndex === index ? 1.0 : (ma.containsMouse ? 0.5 : 0.0)
-                        Behavior on opacity { NumberAnimation { duration: 120 } }
+                        color: root.bgColor
+                        scale: ma.containsMouse ? 1.08 : 1.0
+                        Behavior on scale { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+
+                        Image {
+                            anchors.fill: parent; fillMode: Image.PreserveAspectCrop
+                            source: model.thumb
+                            sourceSize.width: 300 // Biraz daha net olsun zoom yapınca
+                            smooth: true
+                        }
                     }
 
                     MouseArea {
@@ -175,6 +193,27 @@ Item {
                             grid.currentIndex = index;
                             applyWallpaper(model.path, model.thumb.replace("file://", ""));
                         }
+                    }
+                }
+
+                // Seçili olan resmin köşesinde beliren tik (checkmark) işareti
+                // Z-index olarak resmin üstünde kalması için imgWrap'ten sonra eklendi
+                Rectangle {
+                    anchors.right: parent.right; anchors.bottom: parent.bottom
+                    anchors.margins: 1
+                    width: 24; height: 24; radius: 12
+                    color: root.textColor
+                    opacity: grid.currentIndex === index ? 1.0 : 0.0
+                    scale: opacity > 0 ? 1.0 : 0.5
+                    Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
+                    Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
+                    
+                    Text {
+                        anchors.centerIn: parent
+                        text: "✓"
+                        color: root.bgColor
+                        font.pixelSize: 14
+                        font.bold: true
                     }
                 }
 
