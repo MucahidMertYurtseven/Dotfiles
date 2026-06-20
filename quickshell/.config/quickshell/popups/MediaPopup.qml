@@ -1,11 +1,9 @@
 // ============================================================
-// MEDYA POPUP'I — MPRIS oynatıcı kontrolü
-// Şarkı bilgisi, ilerleme çubuğu, önceki/oynat/sonraki
-// Ses slider'ı ile tam medya denetimi
+// MEDIA PLAYER POPUP — Apple-style compact media player
+// Album artwork, track info, progress bar, controls, volume
 // ============================================================
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Services.Pipewire
 import Quickshell.Services.Mpris
@@ -20,13 +18,16 @@ Item {
 
     property var player: null
 
-    // Yerel pozisyon takibi (D-Bus sadece seek/event'te güncellenir)
     property real _trackPosition: 0
 
     readonly property bool hasPlayer: player !== null
     readonly property string trackTitle: hasPlayer ? player.trackTitle : ""
-    readonly property string trackArtist: hasPlayer ? player.trackArtist : ""
-    readonly property bool   isPlaying: hasPlayer ? player.isPlaying : false
+    readonly property string trackArtist: hasPlayer
+        ? (player.trackArtists ? player.trackArtists.join(", ") : (player.trackArtist || ""))
+        : ""
+    readonly property bool isPlaying: hasPlayer ? player.isPlaying : false
+    readonly property bool hasCover: hasPlayer && player.trackCoverUrl && player.trackCoverUrl.toString() !== ""
+    readonly property string coverUrl: hasCover ? player.trackCoverUrl : ""
     readonly property real pos: _trackPosition
     readonly property real len: hasPlayer ? player.length : 0
     readonly property real progress: len > 0 ? pos / len : 0
@@ -35,17 +36,35 @@ Item {
 
     property bool _dragging: false
     property real _dragRatio: 0
-    property real _dragLen: 0
-    property real _progressScaleY: seekArea.containsMouse || _dragging ? 1.0 : 0.75
-    Behavior on _progressScaleY { NumberAnimation { duration: 250; easing.type: Easing.OutQuad } }
 
     property real vol: Pipewire.defaultAudioSink?.audio?.volume ?? 0
     onVolChanged: {
-        if (!volSlider._dragging && !volSlider._clicking)
+        if (!volSlider._dragging)
             volSlider.value = root.vol
     }
 
-    // En iyi oynatıcıyı bul (Playing > Paused)
+    function formatTime(s) {
+        if (s <= 0) return "0:00"
+        var totalSec = Math.floor(s)
+        var h = Math.floor(totalSec / 3600)
+        var m = Math.floor((totalSec % 3600) / 60)
+        var sec = totalSec % 60
+        if (h > 0)
+            return h + ":" + (m < 10 ? "0" : "") + m + ":" + (sec < 10 ? "0" : "") + sec
+        return m + ":" + (sec < 10 ? "0" : "") + sec
+    }
+
+    function formatRemaining(s) {
+        if (len <= 0) return "0:00"
+        var remaining = len - s
+        if (remaining <= 0) return "0:00"
+        var totalSec = Math.floor(remaining)
+        var h = Math.floor(totalSec / 3600)
+        var m = Math.floor((totalSec % 3600) / 60)
+        var sec = totalSec % 60
+        return "-" + (h > 0 ? h + ":" + (m < 10 ? "0" : "") + m + ":" + (sec < 10 ? "0" : "") + sec : m + ":" + (sec < 10 ? "0" : "") + sec)
+    }
+
     function findBestPlayer() {
         var best = null
         var bestPri = -1
@@ -70,7 +89,6 @@ Item {
         if (player) _trackPosition = player.position
     }
 
-    // Kombine timer: oynatıcı bul + pozisyon takibi (direkt D-Bus)
     Timer {
         interval: 250
         running: root.visible
@@ -87,166 +105,155 @@ Item {
         }
     }
 
-    // Oynatıcı değişince pozisyonu senkronize et
     onPlayerChanged: {
-        if (player) {
-            _trackPosition = player.position
-        }
-    }
-
-    function formatTime(s) {
-        if (s <= 0) return "0:00"
-        var totalSec = Math.floor(s)
-        var h = Math.floor(totalSec / 3600)
-        var m = Math.floor((totalSec % 3600) / 60)
-        var sec = totalSec % 60
-        if (h > 0)
-            return h + ":" + (m < 10 ? "0" : "") + m + ":" + (sec < 10 ? "0" : "") + sec
-        return m + ":" + (sec < 10 ? "0" : "") + sec
+        if (player) _trackPosition = player.position
     }
 
     anchors.fill: parent
 
-    // Popup arkaplanı
+    // Glass background
     Rectangle {
         anchors.fill: parent
         color: theme ? theme.bgPopupBlur : "#b231112d"
         radius: theme ? theme.popupRadius : 12
-        border.color: theme ? theme.border : "#6675376d"; border.width: 1
+        border.color: theme ? theme.border : "#6675376d"
+        border.width: 1
     }
 
     ColumnLayout {
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: theme?.popupPad ?? 12 }
-        spacing: 10
+        anchors { fill: parent; margins: 16 }
+        spacing: 0
 
-        // Şarkı bilgisi
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 10
+        // === ALBUM ARTWORK ===
+        Item {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 240
+            Layout.preferredHeight: 240
 
-            Item {
-                width: 56; height: 56
-                Rectangle {
+            Rectangle {
+                anchors.fill: parent
+                radius: 12
+                clip: true
+                color: theme ? theme.empty : "#793370"
+
+                Image {
                     anchors.fill: parent
-                    radius: 10
-                    color: theme ? theme.empty : "#793370"
+                    source: root.coverUrl
+                    sourceSize { width: 480; height: 480 }
+                    fillMode: Image.PreserveAspectCrop
+                    smooth: true
+                    mipmap: true
+                    visible: root.hasCover
+                }
 
-                    ColorizedIcon {
-                        anchors.centerIn: parent
-                        source: root._icons + "music-note-symbolic.svg"
-                        iconSize: 28
-                        iconColor: root.isPlaying
-                            ? (theme ? theme.active : "#dda6d5")
-                            : (theme ? theme.text : "#c6c2c5")
-                    }
+                ColorizedIcon {
+                    anchors.centerIn: parent
+                    source: root._icons + "music-note-symbolic.svg"
+                    iconSize: 64
+                    iconColor: theme ? theme.text : "#c6c2c5"
+                    visible: !root.hasCover
                 }
             }
 
-            ColumnLayout {
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignVCenter
-                spacing: 2
-
-                Text {
-                    Layout.fillWidth: true
-                    text: root.trackTitle
-                    color: theme ? theme.textBright : "#f7f7f7"
-                    font.pixelSize: 14
-                    font.bold: true
-                    font.family: theme ? theme.fontFamily : "monospace"
-                    elide: Text.ElideRight
-                }
-
-                Text {
-                    Layout.fillWidth: true
-                    text: root.trackArtist || "\u2014"
-                    color: theme ? theme.text : "#c6c2c5"
-                    font.pixelSize: 11
-                    font.family: theme ? theme.fontFamily : "monospace"
-                    elide: Text.ElideRight
-                }
+            Rectangle {
+                anchors.fill: parent
+                radius: 12
+                color: "transparent"
+                border.color: Qt.rgba(0, 0, 0, 0.15)
+                border.width: 1
             }
         }
 
-        // İlerleme çubuğu
+        Item { Layout.preferredHeight: 12 }
+
+        // === TRACK INFO ===
+        Text {
+            Layout.fillWidth: true
+            text: root.trackTitle || "No Track"
+            color: theme ? theme.textBright : "#f7f7f7"
+            font.pixelSize: 17
+            font.weight: Font.Bold
+            font.family: theme ? theme.fontFamily : "monospace"
+            elide: Text.ElideRight
+            maximumLineCount: 1
+        }
+
+        Text {
+            Layout.fillWidth: true
+            text: root.trackArtist || "\u2014"
+            color: theme ? theme.textMuted : "#c6c2c5"
+            font.pixelSize: 13
+            font.family: theme ? theme.fontFamily : "monospace"
+            elide: Text.ElideRight
+            maximumLineCount: 1
+            Layout.topMargin: 2
+        }
+
+        Item { Layout.preferredHeight: 10 }
+
+        // === PROGRESS BAR ===
         Item {
             Layout.fillWidth: true
-            implicitHeight: 26
+            Layout.preferredHeight: 28
 
             Rectangle {
                 id: progressTrack
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: 2
-                height: 8
-                radius: height / 2
+                anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter }
+                anchors.verticalCenterOffset: -5
+                height: 4
+                radius: 2
                 color: theme ? theme.border : "#6675376d"
 
-                transform: Scale { origin.y: 4; yScale: root._progressScaleY }
-
                 Rectangle {
-                    anchors.left: parent.left
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
+                    anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
                     width: parent.width * root.displayProgress
-                    radius: parent.radius
+                    radius: 2
                     color: theme ? theme.active : "#dda6d5"
 
                     Rectangle {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                        anchors.topMargin: 1
-                        width: parent.width * 0.8
-                        height: parent.height * 0.3
-                        radius: height / 2
-                        color: Qt.rgba(1, 1, 1, 0.15)
-                        visible: parent.width > 2
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 10
+                        height: 10
+                        radius: 5
+                        color: theme ? theme.active : "#dda6d5"
+                        visible: (seekArea.containsMouse || root._dragging) && root.hasPlayer && root.len > 0
                     }
                 }
             }
 
-            // Süre bilgisi
             Text {
-                anchors.left: parent.left
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: -10
+                anchors { left: parent.left; bottom: parent.bottom }
                 text: root.formatTime(root.displayPos)
-                color: theme ? theme.text : "#c6c2c5"
+                color: theme ? theme.textMuted : "#c6c2c5"
                 font.pixelSize: 11
                 font.family: theme ? theme.fontFamily : "monospace"
             }
 
             Text {
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: -10
-                text: root.formatTime(root.len)
-                color: theme ? theme.text : "#c6c2c5"
+                anchors { right: parent.right; bottom: parent.bottom }
+                text: root.formatRemaining(root.displayPos)
+                color: theme ? theme.textMuted : "#c6c2c5"
                 font.pixelSize: 11
                 font.family: theme ? theme.fontFamily : "monospace"
             }
 
-            // İlerleme çubuğu fare etkileşimi
             MouseArea {
                 id: seekArea
-                anchors.fill: progressTrack
-                anchors.topMargin: -8; anchors.bottomMargin: -8
+                anchors { fill: parent; topMargin: -4; bottomMargin: -4 }
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 enabled: root.hasPlayer && root.len > 0
 
                 onClicked: (mouse) => {
                     if (!root.hasPlayer || !root.player || root.len <= 0) return
-                    root._dragLen = root.len
-                    root._dragRatio = Math.max(0, Math.min(1, mouse.x / progressTrack.width))
-                    var target = root._dragRatio * root._dragLen
+                    var ratio = Math.max(0, Math.min(1, mouse.x / progressTrack.width))
+                    var target = ratio * root.len
                     root._trackPosition = target
                     root.player.position = target
                 }
                 onPressed: (mouse) => {
                     if (!root.hasPlayer || !root.player || root.len <= 0) return
-                    root._dragLen = root.len
                     root._dragging = true
                     root._dragRatio = Math.max(0, Math.min(1, mouse.x / progressTrack.width))
                 }
@@ -255,41 +262,42 @@ Item {
                         root._dragRatio = Math.max(0, Math.min(1, mouse.x / progressTrack.width))
                     }
                 }
-                onReleased: (mouse) => {
-                    if (!root.hasPlayer || !root.player || root._dragLen <= 0) return
+                onReleased: {
+                    if (!root.hasPlayer || !root.player || root.len <= 0) return
                     root._dragging = false
-                    var target = root._dragRatio * root._dragLen
+                    var target = root._dragRatio * root.len
                     root._trackPosition = target
                     root.player.position = target
                 }
             }
         }
 
-        // Kontrol düğmeleri
+        Item { Layout.preferredHeight: 10 }
+
+        // === NAVIGATION CONTROLS ===
         RowLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            spacing: 14
+            spacing: 32
 
-            // Önceki
             Item {
-                width: 28; height: 28
-                property real _s: prevMa.containsMouse ? 1.15 : 1.0
+                width: 32; height: 32
+                property real _s: prevMa.containsMouse ? 1.1 : 1.0
                 scale: _s
                 Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
 
                 ColorizedIcon {
                     anchors.centerIn: parent
                     source: root._icons + "media-skip-backward-symbolic.svg"
-                    iconSize: 22
+                    iconSize: 24
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.active : "#dda6d5")
+                        ? (theme ? theme.text : "#c6c2c5")
                         : (theme ? theme.empty : "#793370")
                 }
 
                 MouseArea {
                     id: prevMa
-                    anchors.fill: parent; anchors.margins: -4
+                    anchors.fill: parent; anchors.margins: -8
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     enabled: root.hasPlayer
@@ -297,22 +305,25 @@ Item {
                 }
             }
 
-            // Oynat/Duraklat
             Item {
-                width: 36; height: 36
-                property real _s: playMa.containsMouse ? 1.12 : 1.0
+                width: 48; height: 48
+                property real _s: playMa.containsMouse ? 1.08 : 1.0
                 scale: _s
                 Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 24
+                    color: "#ffffff"
+                }
 
                 ColorizedIcon {
                     anchors.centerIn: parent
                     source: root.isPlaying
                         ? root._icons + "media-playback-pause-symbolic.svg"
                         : root._icons + "media-playback-start-symbolic.svg"
-                    iconSize: 30
-                    iconColor: root.hasPlayer
-                        ? (theme ? theme.active : "#dda6d5")
-                        : (theme ? theme.empty : "#793370")
+                    iconSize: 28
+                    iconColor: theme ? theme.bgDark : "#252627"
                 }
 
                 MouseArea {
@@ -325,25 +336,24 @@ Item {
                 }
             }
 
-            // Sonraki
             Item {
-                width: 28; height: 28
-                property real _s: nextMa.containsMouse ? 1.15 : 1.0
+                width: 32; height: 32
+                property real _s: nextMa.containsMouse ? 1.1 : 1.0
                 scale: _s
                 Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
 
                 ColorizedIcon {
                     anchors.centerIn: parent
                     source: root._icons + "media-skip-forward-symbolic.svg"
-                    iconSize: 22
+                    iconSize: 24
                     iconColor: root.hasPlayer
-                        ? (theme ? theme.active : "#dda6d5")
+                        ? (theme ? theme.text : "#c6c2c5")
                         : (theme ? theme.empty : "#793370")
                 }
 
                 MouseArea {
                     id: nextMa
-                    anchors.fill: parent; anchors.margins: -4
+                    anchors.fill: parent; anchors.margins: -8
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     enabled: root.hasPlayer
@@ -352,70 +362,50 @@ Item {
             }
         }
 
-        // Ses slider'ı
+        Item { Layout.preferredHeight: 14 }
+
+        // === VOLUME CONTROLS ===
         RowLayout {
             Layout.fillWidth: true
-            spacing: 8
+            spacing: 10
 
             ColorizedIcon {
                 source: (Pipewire.defaultAudioSink?.audio?.muted ?? false)
                     ? root._icons + "audio-volume-muted-symbolic.svg"
-                    : root._icons + "audio-volume-high-symbolic.svg"
-                iconSize: 14
+                    : root._icons + "audio-volume-low-symbolic.svg"
+                iconSize: 16
                 iconColor: (Pipewire.defaultAudioSink?.audio?.muted ?? false)
                     ? (theme ? theme.warn : "#d09caa")
-                    : (theme ? theme.text : "#c6c2c5")
+                    : (theme ? theme.textMuted : "#c6c2c5")
             }
 
-            // Ses slider'ı
             Item {
                 id: volSlider
                 Layout.fillWidth: true
-                Layout.preferredHeight: 24
+                Layout.preferredHeight: 20
 
                 property real value: root.vol
                 readonly property real _pos: Math.min(value, 1.0)
                 property bool _dragging: false
-                property bool _clicking: false
-                property bool _hovered: false
-                property real _scaleY: _hovered || _dragging ? 1.0 : 0.75
-                Behavior on _scaleY { NumberAnimation { duration: 250; easing.type: Easing.OutQuad } }
 
                 onValueChanged: {
-                    if (_dragging || _clicking) {
+                    if (_dragging) {
                         var a = Pipewire.defaultAudioSink?.audio
                         if (a) a.volume = value
                     }
                 }
 
                 Rectangle {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    height: 8
-                    radius: height / 2
+                    anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter }
+                    height: 4
+                    radius: 2
                     color: theme ? theme.border : "#6675376d"
 
-                    transform: Scale { origin.y: 4; yScale: volSlider._scaleY }
-
                     Rectangle {
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
+                        anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
                         width: parent.width * volSlider._pos
-                        radius: parent.radius
+                        radius: 2
                         color: theme ? theme.active : "#dda6d5"
-
-                        Rectangle {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.top: parent.top
-                            anchors.topMargin: 1
-                            width: parent.width * 0.8
-                            height: parent.height * 0.3
-                            radius: height / 2
-                            color: Qt.rgba(1, 1, 1, 0.15)
-                            visible: parent.width > 2
-                        }
                     }
                 }
 
@@ -424,12 +414,8 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
 
-                    onEntered: volSlider._hovered = true
-                    onExited: volSlider._hovered = false
-
                     onPressed: (mouse) => {
                         volSlider._dragging = true
-                        volSlider._clicking = true
                         volSlider.value = Math.max(0, Math.min(1, mouse.x / width))
                     }
 
@@ -441,9 +427,16 @@ Item {
 
                     onReleased: {
                         volSlider._dragging = false
-                        volSlider._clicking = false
                     }
                 }
+            }
+
+            ColorizedIcon {
+                source: root._icons + "audio-volume-high-symbolic.svg"
+                iconSize: 16
+                iconColor: (Pipewire.defaultAudioSink?.audio?.muted ?? false)
+                    ? (theme ? theme.warn : "#d09caa")
+                    : (theme ? theme.textMuted : "#c6c2c5")
             }
         }
     }
