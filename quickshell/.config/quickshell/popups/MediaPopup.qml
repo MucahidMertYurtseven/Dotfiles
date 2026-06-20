@@ -28,9 +28,6 @@ Item {
     readonly property string coverUrl: _coverUrl || ""
     readonly property bool hasCover: coverUrl !== ""
 
-    // Cover URL: Quickshell Mpris API uses trackArtUrl
-    // (not trackCoverUrl). Also try playerctl as fallback for players
-    // that update art URL after initial metadata.
     property string _coverUrl: ""
 
     readonly property real pos: _trackPosition
@@ -54,19 +51,26 @@ Item {
     property real _volScaleY: volSlider._hovered || volSlider._dragging ? 1.0 : 0.75
     Behavior on _volScaleY { NumberAnimation { duration: 250; easing.type: Easing.OutQuad } }
 
-    // Fetch cover URL from Mpris player or fallback to playerctl
     function updateCoverUrl() {
         if (!hasPlayer) {
             _coverUrl = ""
             return
         }
-        // Try native Quickshell Mpris property first
         if (player.trackArtUrl && player.trackArtUrl !== "") {
             _coverUrl = player.trackArtUrl
             return
         }
-        // Fallback: try playerctl for players that expose artUrl late
         if (!_coverUrl || _coverUrl === "") {
+            var name = player.dbusName || ""
+            if (name) {
+                var pname = name
+                var prefix = "org.mpris.MediaPlayer2."
+                if (pname.substring(0, prefix.length) === prefix)
+                    pname = pname.substring(prefix.length)
+                coverProc.command = ["playerctl", "--player", pname, "metadata", "mpris:artUrl"]
+            } else {
+                coverProc.command = ["playerctl", "metadata", "mpris:artUrl"]
+            }
             coverProc.running = true
         }
     }
@@ -141,10 +145,9 @@ Item {
         }
     }
 
-    // playerctl fallback for cover URL
     Process {
         id: coverProc
-        command: ["sh", "-c", "playerctl metadata mpris:artUrl 2>/dev/null || true"]
+        command: ["true"]
         running: false
         stdout: SplitParser {
             onRead: function(line) {
@@ -168,44 +171,49 @@ Item {
     }
 
     ColumnLayout {
-        anchors { fill: parent; margins: theme?.popupPad ?? 12 }
+        anchors { fill: parent; margins: 14 }
         spacing: 0
 
         // === SPACER TOP ===
-        Item { Layout.preferredHeight: 10 }
+        Item { Layout.preferredHeight: 6 }
 
-        // === ALBUM ARTWORK (left-aligned) ===
-        Rectangle {
+        // === ALBUM ARTWORK (centered) ===
+        Item {
+            Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 240
             Layout.preferredHeight: 240
-            radius: 12
-            clip: true
-            color: theme ? theme.empty : "#793370"
-            border.color: Qt.rgba(0, 0, 0, 0.2)
-            border.width: 1
 
-            Image {
+            Rectangle {
                 anchors.fill: parent
-                source: root.coverUrl
-                sourceSize { width: 480; height: 480 }
-                fillMode: Image.PreserveAspectCrop
-                smooth: true
-                mipmap: true
-                visible: root.hasCover
-            }
+                radius: 12
+                clip: true
+                color: theme ? theme.empty : "#793370"
+                border.color: Qt.rgba(0, 0, 0, 0.2)
+                border.width: 1
 
-            ColorizedIcon {
-                anchors.centerIn: parent
-                source: root._icons + "music-note-symbolic.svg"
-                iconSize: 64
-                iconColor: theme ? theme.text : "#c6c2c5"
-                visible: !root.hasCover
+                Image {
+                    anchors.fill: parent
+                    source: root.coverUrl
+                    sourceSize { width: 480; height: 480 }
+                    fillMode: Image.PreserveAspectCrop
+                    smooth: true
+                    mipmap: true
+                    visible: root.hasCover
+                }
+
+                ColorizedIcon {
+                    anchors.centerIn: parent
+                    source: root._icons + "music-note-symbolic.svg"
+                    iconSize: 64
+                    iconColor: theme ? theme.text : "#c6c2c5"
+                    visible: !root.hasCover
+                }
             }
         }
 
         Item { Layout.preferredHeight: 10 }
 
-        // === TRACK INFO (left-aligned with artwork) ===
+        // === TRACK INFO ===
         Text {
             Layout.fillWidth: true
             text: root.trackTitle || "No Track"
@@ -496,6 +504,6 @@ Item {
         }
 
         // === SPACER BOTTOM ===
-        Item { Layout.preferredHeight: 10 }
+        Item { Layout.preferredHeight: 6 }
     }
 }
