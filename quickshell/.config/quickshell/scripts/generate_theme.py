@@ -31,6 +31,7 @@ from pathlib import Path
 BASE = Path(__file__).resolve().parent.parent
 THEME_FILE = BASE / "bar" / "Theme.qml"
 THEME_NEXT_FILE = BASE / "bar" / "Theme.qml.next"
+LOCKSCREEN_THEME_FILE = BASE / "lockscreen" / "Theme.qml"
 FALLBACK_WALL = Path.home() / "Resimler" / "Wallpapers" / "dark_skulls.png"
 AWWW_CACHE = Path.home() / ".cache" / "awww"
 
@@ -453,12 +454,14 @@ def main():
         # Canlı mod: sadece JSON (poller anında alır) + Theme.qml.next (boot'ta kullanılır)
         # Theme.qml'ye DOKUNMA — gereksiz yazma blokaj yapmasın
         _write_theme_to(THEME_NEXT_FILE, palette, source)
+        _write_theme_to(LOCKSCREEN_THEME_FILE, palette, source)
         Path("/tmp/qs_theme.json").write_text(_json.dumps(palette))
         n = 0
     else:
         # Normal mod: tüm dosyaları güncelle + inline fallback sync
         write_theme(palette, source)
         _write_theme_to(THEME_NEXT_FILE, palette, source)
+        _write_theme_to(LOCKSCREEN_THEME_FILE, palette, source)
         Path("/tmp/qs_theme.json").write_text(_json.dumps(palette))
         n = sync_inline_fallbacks(palette)
 

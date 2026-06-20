@@ -7,16 +7,18 @@ Rectangle {
 	id: root
 	required property LockContext context
 
-	readonly property color brightColor:  "#ffffff"
-	readonly property color mutedColor:   "#7e8099"
-	readonly property color accentColor:  "#b0b0b0"
-	readonly property color warnColor:    "#f38ba8"
-	readonly property color borderColor:  "#323232"
-	readonly property color checkColor:   "#f0c040"
-	readonly property string fontFamily:  "MesloLGS Nerd Font"
-	readonly property string clockFont:   "Fira Sans"
+	Theme { id: theme }
 
-	color: "#101010"
+	readonly property color brightColor:  theme.textBright
+	readonly property color mutedColor:   theme.textMuted
+	readonly property color accentColor:  theme.active
+	readonly property color warnColor:    theme.warn
+	readonly property color borderColor:  theme.border
+	readonly property color checkColor:   theme.hover
+	readonly property string fontFamily:  theme.fontFamily
+	readonly property string clockFont:   theme.fontFamily
+
+	color: theme.bgDark
 
 	Image {
 		id: bgImage
@@ -171,7 +173,7 @@ Rectangle {
 
 				background: Rectangle {
 					radius: 26
-					color: "#222222"
+					color: theme.bgPopup
 					border.color: passwordBox.stateColor
 					border.width: passwordBox.activeFocus ? 2 : 1
 					Behavior on border.color {
