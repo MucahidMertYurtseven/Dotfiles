@@ -18,14 +18,19 @@ if [[ -z "$WALL" || ! -f "$WALL" ]]; then
   WALL="$FALLBACK"
 fi
 
-if [[ -f "$WALL" ]]; then
-  if command -v convert &>/dev/null; then
-    convert "$WALL" -resize 1280x720 -blur 0x6 "$OUT" 2>/dev/null &
-  elif command -v magick &>/dev/null; then
-    magick "$WALL" -resize 1280x720 -blur 0x6 "$OUT" 2>/dev/null &
-  elif command -v ffmpeg &>/dev/null; then
-    ffmpeg -i "$WALL" -vf "scale=1280:720,gblur=sigma=6" -q:v 1 -y "$OUT" 2>/dev/null &
-  fi
+LAST_WALL=""
+if [[ -f "/tmp/lock_current_bg" ]]; then
+  LAST_WALL=$(cat "/tmp/lock_current_bg")
 fi
 
+if [[ -f "$WALL" && ("$WALL" != "$LAST_WALL" || ! -f "$OUT") ]]; then
+  if command -v convert &>/dev/null; then
+    convert "$WALL" -resize 1280x720 -blur 0x6 "$OUT" 2>/dev/null
+  elif command -v magick &>/dev/null; then
+    magick "$WALL" -resize 1280x720 -blur 0x6 "$OUT" 2>/dev/null
+  elif command -v ffmpeg &>/dev/null; then
+    ffmpeg -i "$WALL" -vf "scale=1280:720,gblur=sigma=6" -q:v 1 -y "$OUT" 2>/dev/null
+  fi
+  echo "$WALL" > "/tmp/lock_current_bg"
+fi
 exec quickshell -p /home/mert/.config/quickshell/lockscreen/shell.qml
